@@ -1,0 +1,145 @@
+/*
+ * Custom Styles
+ */
+html{
+  font-size: 12.5px;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+nav{
+  background-color: #2196f3;
+}
+
+.divider{
+  margin-top:10px;
+}
+
+.page-title{
+  font-size: 35px;
+}
+
+.page-footer .row{
+margin-bottom: 0px;
+}
+
+.pagination li.active{
+  background-color: #2196f3;
+}
+
+/*Card*/
+.card .card-content{
+  border-radius:0;
+}
+
+.card .card-content p{
+  font-size:12px;
+  font-weight: 900;
+}
+/*End: Card*/
+
+/*Tables*/
+td, th{
+  padding:10px 3px;
+}
+
+td a{
+  /*padding-right:5px;*/
+  padding-left:5px;
+}
+/*End: Tables*/
+
+/*Tables: Search*/
+.input-field input[type="search"]{
+	padding-left: 0.9rem;
+	padding-right: 3em;
+}
+.input-field input[type="search"] ~ .mdi-navigation-close{
+	top: -7px;
+	font-size: 1rem;
+}
+/*End: Tables: Search*/
+
+/*Login Page*/
+#login .col .row .col{
+  margin:0 auto;
+  float:none;
+}
+/* End: Login Page*/
+
+/*Forms*/
+form .row{
+  margin-bottom:6px;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea {
+  height: 1rem;
+}
+.input-field{
+  padding-left: 10px;
+}
+
+.input-field label{
+  top:-0.1rem;
+}
+
+#attachments button{
+  letter-spacing: 0px;
+}
+
+#attachments div.row div.col{
+  padding-left: 0px;
+}
+
+.modal-content .card{
+  margin-left:5px;
+  width: 154px;
+  float:left;
+}
+
+.modal-content .card .card-content {
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.modal-content .card .card-action{
+  font-size: 10px;
+  padding: 5px;
+}
+/*End: Forms*/
+
+/*Profile Page*/
+.select-wrapper span.caret{
+  top:0px;
+}
+#department label{
+  top: -1.5rem;
+}
+#department .select-wrapper input.select-dropdown{
+  height:1rem;
+  margin: 0px 0px 2px;
+}
+/*End: Profile Page*/
+/*Footer*/
+footer.page-footer{
+  background-color: #2196f3;
+}
+
+footer.page-footer .footer-copyright{
+  background-color: #1976d2;
+}
+/*End: Footer*/
+
+/*User Created General Classes*/
+.padding-left-25{
+  padding-left: 25px;
+}
