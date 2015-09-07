@@ -81,7 +81,7 @@ form .row{
 }
 
 input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea {
-  height: 1rem;
+  height: 1.2rem;
 }
 .input-field{
   padding-left: 10px;
@@ -89,6 +89,14 @@ input[type=text], input[type=password], input[type=email], input[type=url], inpu
 
 .input-field label{
   top:-0.1rem;
+}
+
+input[type=text]:disabled{
+  color: black;
+}
+
+input[type=text]:disabled+label{
+  color: black;
 }
 
 #attachments button{
@@ -129,6 +137,7 @@ input[type=text], input[type=password], input[type=email], input[type=url], inpu
   margin: 0px 0px 2px;
 }
 /*End: Profile Page*/
+
 /*Footer*/
 footer.page-footer{
   background-color: #2196f3;
