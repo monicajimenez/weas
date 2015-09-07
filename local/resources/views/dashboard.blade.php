@@ -157,7 +157,7 @@
 								 April 12, 2012
 							</td>
 							<td>
-								<a href="{{ route('request::details') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
+								<a href="{{ route('request.show') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
 							</td>
 						</tr>
 						<tr>
@@ -186,7 +186,7 @@
 								 April 12, 2012
 							</td>
 							<td>
-								<a href="{{ route('request::details') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
+								<a href="{{ route('request.show') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
 							</td>
 						</tr>
 						<tr>
@@ -215,7 +215,7 @@
 								 April 12, 2012
 							</td>
 							<td>
-								<a href="{{ route('request::details') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
+								<a href="{{ route('request.show') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
 							</td>
 						</tr>
 						<tr>
@@ -244,7 +244,7 @@
 								 April 12, 2012
 							</td>
 							<td>
-								<a href="{{ route('request::details') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
+								<a href="{{ route('request.show') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
 							</td>
 						</tr>
 						<tr>
@@ -273,7 +273,7 @@
 								 April 12, 2012
 							</td>
 							<td>
-								<a href="{{ route('request::details') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
+								<a href="{{ route('request.show') }}">View</a><a  class="modal-trigger" href="#modal_action">Approve</a><a class="modal-trigger" href="#modal_action">Hold</a><a class="modal-trigger" href="#modal_action">Deny</a>
 							</td>
 						</tr>
 					</tbody>
