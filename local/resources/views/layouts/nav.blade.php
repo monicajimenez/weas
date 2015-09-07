@@ -67,11 +67,12 @@
                       <a class="collapsible-header waves-effect waves-teal"><i class="material-icons">work</i>Requests</a>
                       <div class="collapsible-body" style="display: block;">
                         <ul>
-                          <li class=""><a href="{{ route('request::pending') }}">Pending Requests</a></li>
-                          <li><a href="{{ route('request::incoming') }}">Incoming Requests</a></li>
-                          <li><a href="{{ route('request::approved') }}">Approved Requests</a></li>
-                          <li><a href="{{ route('request::denied') }}">Denied Requests</a></li>
-                          <li><a href="{{ route('request::all') }}">All Request</a></li>
+                          <li class=""><a href="{{ route('request.index', ['request_status' => 'pending']) }}">Pending Requests</a></li>
+                          <li class=""><a href="{{ route('request.index', ['request_status' => 'on-hold']) }}">On-Hold Requests</a></li>
+                          <li class=""><a href="{{ route('request.index', ['request_status' => 'reset']) }}">Reset Requests</a></li>
+                          <li><a href="{{ route('request.index', ['request_status' => 'approved']) }}">Approved Requests</a></li>
+                          <li><a href="{{ route('request.index', ['request_status' => 'denied']) }}">Denied Requests</a></li>
+                          <li><a href="{{ route('request.index', ['request_status' => 'all']) }}">All Request</a></li>
                         </ul>
                       </div>
                     </li>
