@@ -7,8 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\User;
+use Auth;  
+
 class UserController extends Controller
 {
+    protected $user;
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +20,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
     }
 
      /**
@@ -24,10 +27,27 @@ class UserController extends Controller
      *
      * @return Response
      */
-    public function login()
+    public function login(Request $request)
     {
-        //
-        return view('login');
+        if( Auth::check() || ($request->input('username') && $request->input('password')) )
+        {
+            Auth::attempt(array(
+                'app_email' => $request->input('username'),
+                'password'  => $request->input('password'),
+            ));
+
+            if (Auth::check()) {
+                return view('dashboard');
+            } else 
+            {
+                return view('user.login');
+            }
+        }
+        else
+        {
+            return view('user.login');
+        }   
+        
     }
 
      /**
@@ -38,7 +58,7 @@ class UserController extends Controller
     public function profile()
     {
         //
-        return view('user/profile');
+        return view('user.profile');
     }
 
     /**
