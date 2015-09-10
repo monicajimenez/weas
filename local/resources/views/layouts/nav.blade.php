@@ -45,8 +45,8 @@
                     </a>
                     <div class="collapsible-body" style="display: block;">
                       <ul>
-                        <li class=""><a href="{{ route('user::profile') }}">Profile</a></li>
-                        <li><a href="{{ route('user::login') }}">Log-out</a></li>
+                        <li class=""><a href="{{ route('user.profile') }}">Profile</a></li>
+                        <li><a href="{{ route('user.logout') }}">Log-out</a></li>
                       </ul>
                     </div>
                   </li>

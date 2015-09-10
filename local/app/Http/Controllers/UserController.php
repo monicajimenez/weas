@@ -23,7 +23,7 @@ class UserController extends Controller
     }
 
      /**
-     * Show the form for creating a new resource.
+     * Show the form for user log in.
      *
      * @return Response
      */
@@ -31,23 +31,44 @@ class UserController extends Controller
     {
         if( Auth::check() || ($request->input('username') && $request->input('password')) )
         {
-            Auth::attempt(array(
-                'app_email' => $request->input('username'),
-                'password'  => $request->input('password'),
-            ));
+            if(Auth::attempt(['app_email' => $request->input('username'),'password'  => $request->input('password')]))
+            {
+                Auth::login(Auth::user(), true);
 
-            if (Auth::check()) {
                 return view('dashboard');
-            } else 
+                
+            }
+            else 
             {
                 return view('user.login');
             }
+            
         }
         else
         {
             return view('user.login');
         }   
         
+    }
+
+    /**
+     * Enables user to log out. 
+     *
+     * @return Response
+     */
+    public function logout()
+    {
+        Auth::logout();
+
+        if(Auth::check())
+        {
+            return view('dashboard');
+        }
+        else
+        {
+            return view('user.login');
+        }
+
     }
 
      /**
@@ -58,7 +79,9 @@ class UserController extends Controller
     public function profile()
     {
         //
-        return view('user.profile');
+         $user['details'] = Auth::user();
+
+        return view('user.profile', $user);
     }
 
     /**
