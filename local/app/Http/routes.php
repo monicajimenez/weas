@@ -21,41 +21,61 @@ Route::controllers([
 
 /*Dashboard*/
 Route::get('dashboard', [
-    'as' => 'dashboard', 
+    'as' => 'dashboard',
+    'middleware' => 'auth.user', 
     'uses' => 'DashboardController@index'
 ]);
 /*End: Dashboard*/
 
 /*User*/
 Route::resource('user', 'UserController');
-Route::group(['as' => 'user::'], function () {
+Route::group(['as' => 'user.'], function () {
    	Route::get('/', [
     		   'as' => 'login', 
     		   'uses' => 'UserController@login'
     		]);
    	Route::get('profile', [
-    		   'as' => 'profile', 
+    		   'as' => 'profile',
+               'middleware' => 'auth.user', 
     		   'uses' => 'UserController@profile'
     		]);
+    Route::get('logout', [
+               'as' => 'logout',
+               'uses' => 'UserController@logout'
+            ]);
 });
 /*End: User*/
 
 /*Requests*/
 Route::resource('request', 'RequestController', [
-    'except' => ['update']
+    'except' => ['update'],
+    'middleware' => 'auth.user'
 ]);
 Route::get('request/view/{request_status}', 
 [
-    'as' => 'request.index', 
+    'as' => 'request.index',
+    'middleware' => 'auth.user',  
     'uses' => 'RequestController@index'
 ]);
 Route::get('request/update/{request_id})', 
 [
-    'as' => 'request.update', 
+    'as' => 'request.update',
+    'middleware' => 'auth.user', 
     'uses' => 'RequestController@update'
 ]);
 /*End: Requests*/
 
 /*Attachments*/
-Route::get('download/{attachment_code}', ['as' => 'download', 'uses' => 'AttachmentController@download']);
+Route::group(['as' => 'attachment.'], function () {
+    Route::get('attachment/download/{attachment_code}', [
+               'as' => 'download', 
+               'middleware' => 'auth.user',
+               'uses' => 'AttachmentController@download'
+            ]);
+    Route::post('attachment/upload/', [
+               'as' => 'upload', 
+               'middleware' => 'auth.user',
+               'uses' => 'AttachmentController@upload'
+            ]);
+});
 /*End: Attachments*/

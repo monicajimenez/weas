@@ -18,6 +18,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      * @var string
      */
     protected $table = 'dbo.approver';
+    protected $primaryKey = 'app_code';
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.

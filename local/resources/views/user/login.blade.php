@@ -6,7 +6,7 @@
 	<div class="col s12 m11 right">
 		<div class="row">
 			<div class="col s12 m3 center-align">
-				<form action="{{ route('user::login') }}" method="put">
+				<form action="{{ route('user.login') }}" method="put">
 					<div class="card medium">
 					    <div class="card-image">
 					      <img class="circle responsive-img" src="{{ asset('images/login.jpg') }}">
@@ -26,7 +26,7 @@
 			                </div>
 					    </div>
 					    <div class="card-action">
-					    	<button type="submit" name="login" class="waves-effect waves-light btn">Log In</button>
+					    	<button type="submit" class="waves-effect waves-light btn">Log In</button>
 					    </div>
 					</div>
 				</form>

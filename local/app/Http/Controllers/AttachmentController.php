@@ -31,8 +31,16 @@ class AttachmentController extends Controller
     
     public function download($attachmentCode = '')
     {
-        $attachment = new Attachment;
-        echo $attachment->getAttachment($attachmentCode);
+        if ($attachmentCode)
+        {
+            $attachment = new Attachment;
+            echo $attachment->getAttachment($attachmentCode);
+        }
+        else
+        {
+            
+        }
+        
     }
 
     /**
@@ -51,9 +59,11 @@ class AttachmentController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store(Request $request)
+    public function upload(Request $request)
     {
-        //
+        $attachment = new Attachment;
+        $attachment->uploadAttachment($request->request_id);
+
     }
 
     /**
