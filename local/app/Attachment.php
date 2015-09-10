@@ -4,25 +4,69 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+
+// user added includes
+use Input;
+
 class Attachment extends Model
 {
-    protected $table = 'attachment';
+    protected $table = 'dbo.attachment';
+    protected $primaryKey = 'att_code';
+    public $timestamps = false;
 
+    
     /**
-     * Retrieves the given resource
+     * Retrieves the given attachement
      *
      * @return Response
      */
-    public function getAttachment($attachmentCode ='')
+    public function uploadAttachment($requestID = '')
+    {
+        $attachment_storage = '/app/Attachment/'.$requestID.'/';
+        $attachment = Input::file('upload_attachment');
+
+        $attachment->move( base_path().$attachment_storage , $attachment->getClientOriginalName());
+    
+        $this->insert(
+           ['att_name' => $attachment->getClientOriginalName(),
+            'att_location' => $attachment_storage,
+            'rfc_code' => $requestID,
+            'atype_code' => intval(Input::get('attachment_type')),
+            ]
+        );
+
+    }
+
+    /**
+     * Retrieves the given attachment
+     *
+     * @return Response
+     */
+    public function getAttachment($attachmentCode = '')
     {
     	$attachment = $this->where('att_code', $attachmentCode)->first();
-        $mime = $this->get_mime_type($attachment->att_name);
+        $mime = $this->getMimeType($attachment->att_name);  
 
-        header("Content-length:" . strlen($attachment->att_file));
-        header("Content-type: $mime");
-        header("Content-Disposition: attachment; filename='$attachment->att_name'");
+        if($attachment->att_file)
+        {
+            header("Content-length:" . strlen($attachment->att_file));
+            header("Content-type: $mime");
+            header("Content-Disposition: attachment; filename='$attachment->att_name'");
 
-        return hex2bin($attachment->att_file); 
+            return hex2bin($attachment->att_file); 
+        }
+        else
+        {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.$attachment->att_name.'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize(base_path().$attachment->att_location.$attachment->att_name));
+            return readfile(base_path().$attachment->att_location.$attachment->att_name);
+        }
+        
     }
 
     /**
@@ -30,7 +74,7 @@ class Attachment extends Model
      *
      * @return Response
      */
-    public function get_mime_type($fileName='')
+    public function getMimeType($fileName='')
     {
             $mime_types = array(
                     "pdf"=>"application/pdf"
@@ -59,7 +103,7 @@ class Attachment extends Model
                     ,"htm"=>"text/html"
                     ,"html"=>"text/html"
             );
-
+    
             return $mime_types[strtolower(pathinfo($fileName, PATHINFO_EXTENSION))];
     }
 

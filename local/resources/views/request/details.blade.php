@@ -268,10 +268,11 @@
         </ul>
       </div>
       <!-- End: Buttons-->
+      </form>
+      
       <!-- Attachments -->
       @include("request.attachment")
       <!-- End: Attachments -->
-      </form>
   </div>
 </div>
 @stop

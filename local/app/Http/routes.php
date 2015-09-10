@@ -66,5 +66,16 @@ Route::get('request/update/{request_id})',
 /*End: Requests*/
 
 /*Attachments*/
-Route::get('download/{attachment_code}', ['as' => 'download', 'middleware' => 'auth.user', 'uses' => 'AttachmentController@download']);
+Route::group(['as' => 'attachment.'], function () {
+    Route::get('attachment/download/{attachment_code}', [
+               'as' => 'download', 
+               'middleware' => 'auth.user',
+               'uses' => 'AttachmentController@download'
+            ]);
+    Route::post('attachment/upload/', [
+               'as' => 'upload', 
+               'middleware' => 'auth.user',
+               'uses' => 'AttachmentController@upload'
+            ]);
+});
 /*End: Attachments*/
