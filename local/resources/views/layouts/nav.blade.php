@@ -39,7 +39,10 @@
                           <img src="{{ asset('images/user/male_chibi_1.png') }}" alt="" class="circle responsive-img">
                         </div>
                         <div class="col s9">
-                          <span class="black-text truncate">Maria Monica I. Jimenez </span>
+                          <span class="black-text truncate">
+                            @if(Auth::check()){{Auth::user()->app_fname}} {{Auth::user()->app_lname}}
+                            @else Hello User!
+                            @endif</span>
                         </div>
                       </div>
                     </a>

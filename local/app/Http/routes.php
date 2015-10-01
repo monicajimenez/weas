@@ -31,6 +31,10 @@ Route::get('dashboard', [
 Route::resource('user', 'UserController');
 Route::group(['as' => 'user.'], function () {
    	Route::get('/', [
+               'as' => 'login', 
+               'uses' => 'UserController@login'
+            ]);
+    Route::post('login', [
     		   'as' => 'login', 
     		   'uses' => 'UserController@login'
     		]);
@@ -66,6 +70,9 @@ Route::get('request/update/{request_id})',
 /*End: Requests*/
 
 /*Attachments*/
+Route::resource('attachment', 'AttachmentController', [
+    'middleware' => 'auth.user'
+]);
 Route::group(['as' => 'attachment.'], function () {
     Route::get('attachment/download/{attachment_code}', [
                'as' => 'download', 
@@ -76,6 +83,11 @@ Route::group(['as' => 'attachment.'], function () {
                'as' => 'upload', 
                'middleware' => 'auth.user',
                'uses' => 'AttachmentController@upload'
+            ]);
+    Route::get('attachment/delete/{attachment_code}', [
+               'as' => 'delete', 
+               'middleware' => 'auth.user',
+               'uses' => 'AttachmentController@delete'
             ]);
 });
 /*End: Attachments*/

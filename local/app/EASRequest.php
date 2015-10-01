@@ -117,7 +117,12 @@ class EASRequest extends Model
                                     ->where(['rfc.rfc_code' => $requestID, 'rfc_line.app_code' => session('user_id')])
                                     ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
                                     ->first();
-        $details->attachments = DB::table('attachment')->where('attachment.rfc_code','=',$requestID)->get(['attachment.att_file','attachment.att_name','app_code','att_code']);
+        $details->attachments = DB::table('attachment')->where('attachment.rfc_code','=',$requestID)
+                                    ->where(function($query){
+                                        $query->orWhere('attachment.att_delete', '!=', '1')
+                                            ->orWhereNull('attachment.att_delete');
+                                    })
+                                    ->get(['attachment.att_file','attachment.att_name','app_code','att_code']);
 
         return $details;
     }
@@ -143,6 +148,27 @@ class EASRequest extends Model
             $this->where(['rfc_code' => $requestID])->update(['rfc_stat' => $approverResponse]);    
         }
         
+    }
+
+    /**
+     * Gets requests statistics 
+     * (Total number of requests, pending requests, 
+     * approved requests, and denied requests)
+     * @return Response
+     */
+    public function getRequestStatistics($user_id = '')
+    {
+        //Retrive Request IDs
+        $requestIDs = DB::table('rfc_line')->where('app_code', '=', $user_id)->lists('rfc_code');
+
+        //Get total number of requests per type
+        $statistics = $this->select(DB::raw('rfc_stat, count(*) as total'))
+                                ->whereIn('rfc_code', $requestIDs)
+                                ->groupBy('rfc_stat')
+                                ->orderBy('rfc_stat')
+                                ->get();
+
+        return $statistics;
     }
  
 }
