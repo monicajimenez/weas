@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+//additional includes
 use App\User;
 use Auth;  
+use Redirect;
 
 class UserController extends Controller
 {
@@ -23,31 +25,56 @@ class UserController extends Controller
     }
 
      /**
-     * Show the form for creating a new resource.
+     * Show the form for user log in.
      *
      * @return Response
      */
     public function login(Request $request)
     {
-        if( Auth::check() || ($request->input('username') && $request->input('password')) )
+        if( Auth::check())
         {
-            Auth::attempt(array(
-                'app_email' => $request->input('username'),
-                'password'  => $request->input('password'),
-            ));
-
-            if (Auth::check()) {
-                return view('dashboard');
-            } else 
+            return Redirect::route('dashboard');
+        }
+        else if(($request->input('username') && $request->input('password')))
+        {
+            if(Auth::attempt(['app_email' => $request->input('username'),'password'  => $request->input('password')]))
             {
-                return view('user.login');
+                Auth::login(Auth::user(), true);
+                return Redirect::route('dashboard');        
             }
+            else 
+            {
+                return Redirect::back()->withErrors(['Invalid email or password.']);  
+            }           
+        }
+        else if( ($request->input('username') && !$request->input('password')) || 
+                 (!$request->input('username') && $request->input('password'))  )
+        {
+            return view('user.login')->withErrors(['Email and Password is required.']);  
         }
         else
         {
             return view('user.login');
-        }   
-        
+        }    
+    }
+
+    /**
+     * Enables user to log out. 
+     *
+     * @return Response
+     */
+    public function logout()
+    {
+        Auth::logout();
+
+        if(Auth::check())
+        {
+            return Redirect::route('request.index', ['request_status' => 'pending']);
+        }
+        else
+        {
+            return view('user.login');
+        }
     }
 
      /**
@@ -57,8 +84,9 @@ class UserController extends Controller
      */
     public function profile()
     {
-        //
-        return view('user.profile');
+        $user['details'] = Auth::user();
+
+        return view('user.profile', $user);
     }
 
     /**

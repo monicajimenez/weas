@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 
 //additional includes
 use App\Attachment;
+use Redirect;
+use Auth;
 
 class AttachmentController extends Controller
 {
@@ -31,18 +33,35 @@ class AttachmentController extends Controller
     
     public function download($attachmentCode = '')
     {
-        $attachment = new Attachment;
-        echo $attachment->getAttachment($attachmentCode);
+        if ($attachmentCode)
+        {
+            $attachment = new Attachment;
+            echo $attachment->getAttachment($attachmentCode);
+        }
+        else
+        {
+            return Redirect::back()->withErrors(['Attachment code not indicated.']);   
+        }
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Remove the specified resource from storage.
      *
+     * @param  int  $id
      * @return Response
      */
-    public function create()
+    public function delete($attachment_code = '')
     {
-        //
+        if($attachment_code)
+        {
+            $attachment = new Attachment;
+            $attachment->deleteAttachment($attachment_code);
+            return Redirect::back();
+        }
+        else{
+            return Redirect::back()->withErrors(['Attachment code not indicated.']);  
+        }
+        
     }
 
     /**
@@ -51,9 +70,18 @@ class AttachmentController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store(Request $request)
+    public function upload(Request $request)
     {
-        //
+        if($request->upload_attachment)
+        {
+            $attachment = new Attachment;
+            $attachment->uploadAttachment($request->request_id, trim(Auth::user()->app_code));
+            return Redirect::back();
+        }
+        else
+        {
+            return Redirect::back()->withErrors(['No file attached.']);    
+        } 
     }
 
     /**
@@ -64,7 +92,15 @@ class AttachmentController extends Controller
      */
     public function show($id)
     {
-        //
+        if($id)
+        {
+            $attachment = new Attachment;
+            $attachment->showAttachment($id);
+        }
+        else
+        {
+            return Redirect::back()->withErrors(['Attachment code not indicated.']);
+        }
     }
 
     /**
@@ -96,7 +132,7 @@ class AttachmentController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         //
     }

@@ -12,6 +12,8 @@ use App\EASRequest;
 use Session;
 use DB;
 use Input;
+use Auth;
+use Form;
 
 class RequestController extends Controller
 {
@@ -29,8 +31,9 @@ class RequestController extends Controller
         $data['request_status_label'] = '';
         $data['request_table_status_column'] = 0;
         $data['search'] = $inputs->search;
-        $data['requests'] = $EASRequest->getRequest(session('user_id'), $data['request_status'], $data['search']);
-        
+        $user_id = trim(Auth::user()->app_code);
+        $data['requests'] = $EASRequest->getRequest($user_id, $data['request_status'], $data['search']);
+
         // Format Data
         if( $data['request_status'] == 'all' )
         {
@@ -90,7 +93,7 @@ class RequestController extends Controller
         if($request_id)
         {
             $EASRequest = new EASRequest;
-            $user_id = session('user_id');
+            $user_id = trim(Auth::user()->app_code);
             $data = [];
             $data['details'] = $EASRequest->getRequestDetails($request_id);
             $data['signed'] = 0;
@@ -109,7 +112,7 @@ class RequestController extends Controller
                 }
             }
     
-            return view('request/details', $data);
+            return view('request.details', $data);
         }
         else
         {
@@ -142,12 +145,13 @@ class RequestController extends Controller
         if(Input::get('approver_response'))
         {
             $EASRequest = new EASRequest;
-            $EASRequest->updateRequest($request_id,Input::get('approver_response'),session('user_id'), $request->input('remarks'));
+            $user_id = trim(Auth::user()->app_code);
+            $EASRequest->updateRequest($request_id,Input::get('approver_response'),$user_id, $request->input('remarks'));
 
             $data = [];
             $data['details'] = $EASRequest->getRequestDetails($request_id);
 
-            return view('request/details', $data);
+            return view('request.details', $data);
         }
     }
 

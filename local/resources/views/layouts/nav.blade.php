@@ -39,14 +39,17 @@
                           <img src="{{ asset('images/user/male_chibi_1.png') }}" alt="" class="circle responsive-img">
                         </div>
                         <div class="col s9">
-                          <span class="black-text truncate">Maria Monica I. Jimenez </span>
+                          <span class="black-text truncate">
+                            @if(Auth::check()){{Auth::user()->app_fname}} {{Auth::user()->app_lname}}
+                            @else Hello User!
+                            @endif</span>
                         </div>
                       </div>
                     </a>
                     <div class="collapsible-body" style="display: block;">
                       <ul>
-                        <li class=""><a href="{{ route('user::profile') }}">Profile</a></li>
-                        <li><a href="{{ route('user::login') }}">Log-out</a></li>
+                        <li class=""><a href="{{ route('user.profile') }}">Profile</a></li>
+                        <li><a href="{{ route('user.logout') }}">Log-out</a></li>
                       </ul>
                     </div>
                   </li>

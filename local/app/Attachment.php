@@ -4,25 +4,94 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+//additional includes
+use Input;
+
 class Attachment extends Model
 {
-    protected $table = 'attachment';
+    protected $table = 'dbo.attachment';
+    protected $primaryKey = 'att_code';
+    public $timestamps = false;
 
+    
     /**
-     * Retrieves the given resource
+     * Retrieves the given attachement
      *
      * @return Response
      */
-    public function getAttachment($attachmentCode ='')
+    public function uploadAttachment($request_id = '', $user_id = '')
     {
-    	$attachment = $this->where('att_code', $attachmentCode)->first();
-        $mime = $this->get_mime_type($attachment->att_name);
+        $attachment_storage = '/app/Attachment/'.$request_id.'/';
+        $attachment = Input::file('upload_attachment');
 
-        header("Content-length:" . strlen($attachment->att_file));
-        header("Content-type: $mime");
-        header("Content-Disposition: attachment; filename='$attachment->att_name'");
+        $attachment->move( base_path().$attachment_storage , $attachment->getClientOriginalName());
+    
+        $this->insert(
+           ['att_name' => $attachment->getClientOriginalName(),
+            'att_location' => $attachment_storage,
+            'rfc_code' => $request_id,
+            'atype_code' => intval(Input::get('attachment_type')),
+            'app_code' => $user_id,
+            ]
+        );
+    }
 
-        return hex2bin($attachment->att_file); 
+    /**
+     * Retrieves the given attachment
+     *
+     * @return Response
+     */
+    public function getAttachment($attachment_code = '')
+    {
+    	$attachment = $this->where('att_code', $attachment_code)->first();
+        $mime = $this->getMimeType($attachment->att_name);  
+
+        if($attachment->att_file)
+        {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.$attachment->att_name.'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+
+            return hex2bin($attachment->att_file); 
+        }
+        else
+        {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.$attachment->att_name.'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize(base_path().$attachment->att_location.$attachment->att_name));
+
+            return readfile(base_path().$attachment->att_location.$attachment->att_name);
+        }
+        
+    }
+
+    public function showAttachment($attachment_code = '')
+    {
+        $attachment = $this->where('att_code', $attachment_code)->first();
+        $mime = $this->getMimeType($attachment->att_name);   
+
+        if($attachment->att_file)
+        {
+            header("Content-length:" . strlen($attachment->att_file));
+            header('Content-disposition: inline');
+            header('Content-type:'.$mime);
+
+            echo hex2bin($attachment->att_file); 
+        }
+        else
+        {
+            header('Content-disposition: inline');
+            header('Content-type:'.$mime);
+            
+            return readfile(base_path().$attachment->att_location.$attachment->att_name);
+        }
     }
 
     /**
@@ -30,7 +99,7 @@ class Attachment extends Model
      *
      * @return Response
      */
-    public function get_mime_type($fileName='')
+    public function getMimeType($filename='')
     {
             $mime_types = array(
                     "pdf"=>"application/pdf"
@@ -59,8 +128,17 @@ class Attachment extends Model
                     ,"htm"=>"text/html"
                     ,"html"=>"text/html"
             );
+            return $mime_types[strtolower(pathinfo($filename, PATHINFO_EXTENSION))];
+    }
 
-            return $mime_types[strtolower(pathinfo($fileName, PATHINFO_EXTENSION))];
+    /**
+     * Soft Deletes the given attachement
+     *
+     * @return Response
+     */
+    public function deleteAttachment($attachment_code = '')
+    {
+        $this->where(['att_code' => $attachment_code])->update(['att_delete' => 1]);
     }
 
 }
