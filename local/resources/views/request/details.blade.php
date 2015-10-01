@@ -5,6 +5,11 @@
 <div class="row">
   <div class="col s11 m10 right">
     <form action="{{ route('request.update', ['request_id' => trim($details->rfc_code)]) }}" method="get">
+    @if($errors->any())
+      @foreach($errors->all() as $error)
+        <p class="errors">{{$error}}</p>
+      @endforeach
+    @endif
       <!-- Basic and Project Details -->
       <div class="row">
         <div class="col s10 m5">

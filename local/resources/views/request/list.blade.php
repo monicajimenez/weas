@@ -74,7 +74,10 @@
                   @if ( isset($request_table_status_column) && $request_table_status_column == 1 )
                     <td>{{ trim($request->rfc_stat) }}</td>
                   @endif
-                  <td><a href="{{ route('request.show', trim($request->rfc_code) ) }}">View</a><a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a></td>
+                  <td>
+                    <a href="{{ route('request.show', trim($request->rfc_code) ) }}">View</a>
+                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
+                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
                 </tr>
               @endforeach
             </tbody>
@@ -96,5 +99,6 @@
     </div>
     <!-- Pagination -->
   </div>
+  @include("request/modal_remarks")
 </div>
 @stop

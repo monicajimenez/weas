@@ -109,8 +109,9 @@ input[type=text]:disabled+label{
 
 .modal-content .card{
   margin-left:5px;
-  width: 154px;
+  width: 166px;
   float:left;
+  min-height: 184px;
 }
 
 .modal-content .card .card-content {
@@ -151,4 +152,10 @@ footer.page-footer .footer-copyright{
 /*User Created General Classes*/
 .padding-left-25{
   padding-left: 25px;
+}
+
+.errors{
+  color: red;
+  font-size: 13px;
+  font-style: italic;
 }

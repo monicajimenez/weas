@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+//additional includes
 use App\User;
 use Auth;  
+use Redirect;
 
 class UserController extends Controller
 {
@@ -29,26 +31,31 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-        if( Auth::check() || ($request->input('username') && $request->input('password')) )
+        if( Auth::check())
+        {
+            return Redirect::route('dashboard');
+        }
+        else if(($request->input('username') && $request->input('password')))
         {
             if(Auth::attempt(['app_email' => $request->input('username'),'password'  => $request->input('password')]))
             {
                 Auth::login(Auth::user(), true);
-
-                return view('dashboard');
-                
+                return Redirect::route('dashboard');        
             }
             else 
             {
-                return view('user.login');
-            }
-            
+                return Redirect::back()->withErrors(['Invalid email or password.']);  
+            }           
+        }
+        else if( ($request->input('username') && !$request->input('password')) || 
+                 (!$request->input('username') && $request->input('password'))  )
+        {
+            return view('user.login')->withErrors(['Email and Password is required.']);  
         }
         else
         {
             return view('user.login');
-        }   
-        
+        }    
     }
 
     /**
@@ -62,13 +69,12 @@ class UserController extends Controller
 
         if(Auth::check())
         {
-            return view('dashboard');
+            return Redirect::route('request.index', ['request_status' => 'pending']);
         }
         else
         {
             return view('user.login');
         }
-
     }
 
      /**
@@ -78,8 +84,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        //
-         $user['details'] = Auth::user();
+        $user['details'] = Auth::user();
 
         return view('user.profile', $user);
     }

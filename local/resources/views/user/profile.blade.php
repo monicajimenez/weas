@@ -12,25 +12,25 @@
 				<div class="col s10 m5">
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="last_name" type="text" class="validate">
+							<input id="last_name" type="text" class="validate" value="{{$details->app_lname}}">
 							<label for="last_name">Last Name</label>
 						</div>
 					</div>
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="first_name" type="text" class="validate">
+							<input id="first_name" type="text" class="validate" value="{{$details->app_fname}}">
 							<label for="first_name">First Name</label>
 						</div>
 					</div>
 					<div class="row">
 						<div class="input-field col s12">
-							<input disabled id="username" type="text" class="validate">
+							<input disabled id="username" type="text" class="validate" value="{{$details->app_uname}}">
 							<label for="username">Username</label>
 						</div>
 					</div>
 					<div class="row">
 						<div class="input-field col s12">
-							<input disabled id="email" type="text" class="validate">
+							<input disabled id="email" type="text" class="validate" value="{{$details->app_email}}">
 							<label for="email">Email</label>
 						</div>
 					</div>
@@ -38,7 +38,7 @@
 				<div class="col s10 m5 padding-left-25 hide-on-small-only">
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="position" type="text" class="validate">
+							<input id="position" type="text" class="validate" value="{{$details->app_position}}">
 							<label for="position">Position</label>
 						</div>
 					</div>
@@ -55,7 +55,7 @@
 					</div>
 					<div class="row">
 						<div class="input-field col s12">
-							<input disabled id="account_type" type="text" class="validate">
+							<input disabled id="account_type" type="text" class="validate" value="{{$details->app_acc}}">
 							<label for="account_type">Account Type</label>
 						</div>
 					</div>
@@ -63,7 +63,7 @@
 				<div class="col s10 m5 hide-on-med-and-up">
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="position" type="text" class="validate">
+							<input id="position" type="text" class="validate" value="{{$details->app_position}}">
 							<label for="position">Position</label>
 						</div>
 					</div>
@@ -80,21 +80,21 @@
 					</div>
 					<div class="row">
 						<div class="input-field col s12">
-							<input disabled id="account_type" type="text" class="validate">
+							<input disabled id="account_type" type="text" class="validate" value="{{$details->app_acc}}">
 							<label for="account_type">Account Type</label>
 						</div>
 					</div>
 				</div>
 			</div>
 			<!-- End: Basic Details -->
-			<div class="row">
+			<!-- <div class="row">
 				<div class="col s12">
 					<div class="divider">
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<!-- Security Details -->
-			<div class="row">
+			<!-- <div class="row">
 				<div class="col s10 m5">
 					<h5>Security Details:</h5>
 					<div class="row">
@@ -110,15 +110,15 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<!-- End: Security Details -->
 		</form>
 		<!-- Buttons-->
-		<div class="fixed-action-btn" style="bottom: 80px;">
+		<!-- <div class="fixed-action-btn" style="bottom: 80px;">
 			<a class="btn-floating btn-large green">
 			<i class="large material-icons">perm_identity</i>
 			</a>
-		</div>
+		</div> -->
 		<!-- End: Buttons-->
 	</div>
 </div>
