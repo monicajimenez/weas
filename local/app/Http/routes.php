@@ -91,3 +91,9 @@ Route::group(['as' => 'attachment.'], function () {
             ]);
 });
 /*End: Attachments*/
+
+/*Admin Fee*/
+Route::resource('adminfee', 'AdminFeeController', [
+    'middleware' => 'auth.user'
+]);
+/*End: Admin Fee*/
