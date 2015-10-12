@@ -26,25 +26,19 @@ class DashboardController extends Controller
         // Initialization 
         $EASRequest = new EASRequest;
         $data = [];
-        $data['request_status'] = 'Pending';
+        $data['request_status'] = 'Unsigned';
         $data['request_status_label'] = 'Dashboard';
         $data['request_table_status_column'] = 0;
         $data['search'] = $inputs->search;
         $user_id = trim(Auth::user()->app_code);
+
+        //Retrieving Data
         $data['requests'] = $EASRequest->getRequest($user_id, $data['request_status'], $data['search']);
-        $data['statistics'] = $this->getRequestsStatistics();
+        $data['statistics'] = $EASRequest->getRequestStatistics($user_id);
+        $data['statistics_unsigned'] = $EASRequest->getUnsignedRequestStatistics($user_id);
 
         // Generate View
         return view('dashboard', $data);
-    }
-
-    public function getRequestsStatistics()
-    {
-        // Initialization
-        $EASRequest = new EASRequest;
-        $user_id = trim(Auth::user()->app_code);
-        
-        return $EASRequest->getRequestStatistics($user_id);;
     }
    
 }
