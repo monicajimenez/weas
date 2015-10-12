@@ -18,8 +18,8 @@
 						                    elseif( trim($data->rfc_stat) == 'Denied') echo 'red';
 						                    elseif( trim($data->rfc_stat) == 'On-Hold') echo 'yellow';
 						                    elseif( trim($data->rfc_stat) == 'Approved') echo 'green';
-						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'black';
-						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'white';
+						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'grey';
+						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'purple';
 					                    ?>
 					                white-text">
 					                    <p class="card-stats-title"><i class="material-icons left">
@@ -41,8 +41,8 @@
 						                    elseif( trim($data->rfc_stat) == 'Denied') echo 'red';
 						                    elseif( trim($data->rfc_stat) == 'On-Hold') echo 'yellow';
 						                    elseif( trim($data->rfc_stat) == 'Approved') echo 'green';
-						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'black';
-						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'white';
+						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'grey';
+						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'purple';
 					                    ?>
 					                darken-2">
 					                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
@@ -55,18 +55,22 @@
 			</div>
 		</div>
 		<!-- End: Requests Statistics -->
-		
+
 		<!-- Requests Table Container -->
 		<!-- Table Label -->
 		<div class="row">
 			<div class="col s11 m10 right">
-				<h5 class="left-align">Pending Requests</h5>
+				<h5 class="left-align">Unsigned Pending Requests 
+					@if(count($requests) > 0)
+						<em class="red-text">({{$statistics_unsigned->total}})</em>
+					@endif
+				</h5>
 			</div>
 		</div>
 		<!-- End: Table Label -->
 		
 		<!-- Search Field -->
-	    @if ($requests->count()>0)
+	    @if ($requests->count()>0 || Input::get('search'))
 	    <div class="row">
 	      <div class="col s12 m3 right">
 	        <form action="{{ route('dashboard') }}" method="get">
@@ -82,57 +86,69 @@
 	    <!-- End: Search Field -->
 
 		<!-- Request Table -->
-		<div class="row">
-			<div class="col s12 m10 right">
-				<table class="responsive-table hoverable">
-					<thead class="">
-						<tr>
-							<th data-field="code" class="center-align">
-								 Code
-							</th>
-							<th data-field="owners_name" class="center-align">
-								 Owner's Name
-							</th>
-							<th data-field="project_name" class="center-align">
-								 Project Name
-							</th>
-							<th data-field="lot_code" class="center-align">
-								 Lot Code
-							</th>
-							<th data-field="payment_scheme" class="center-align">
-								 Payment Scheme
-							</th>
-							<th data-field="qualification_date" class="center-align">
-								 Qualification Date
-							</th>
-							<th data-field="date_filed" class="center-align">
-								 Date Filed
-							</th>
-							<th data-field="actions" class="center-align">
-								 Actions
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-		              @foreach ($requests as $request)
-		                <tr>
-		                  <td>{{ trim($request->rfc_code) }}</td>
-		                  <td>{{ trim($request->rfc_name) }}</td>
-		                  <td>{{ trim($request->project_no) }}</td>
-		                  <td>{{ trim($request->lot_no) }}</td>
-		                  <td>{{ trim($request->rfc_scheme) }}</td>
-		                  <td>{{ date('m/d/Y', strtotime(trim($request->rfc_alertdate))) }}</td>
-		                  <td>{{ date('m/d/Y', strtotime(trim($request->rfc_DOR))) }}</td>
-		                  <td>
-		                    <a href="{{ route('request.show', trim($request->rfc_code) ) }}">View</a>
-		                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
-		                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
-		                </tr>
-		              @endforeach
-		            </tbody>
-				</table>
+		 @if ($requests->count()>0)
+			<div class="row">
+				<div class="col s12 m10 right">
+					<table class="responsive-table hoverable">
+						<thead class="">
+							<tr>
+								<th data-field="code" class="center-align">
+									 Code
+								</th>
+								<th data-field="owners_name" class="center-align">
+									 Owner's Name
+								</th>
+								<th data-field="project_name" class="center-align">
+									 Project Name
+								</th>
+								<th data-field="lot_code" class="center-align">
+									 Lot Code
+								</th>
+								<th data-field="payment_scheme" class="center-align">
+									 Payment Scheme
+								</th>
+								<th data-field="qualification_date" class="center-align">
+									 Qualification Date
+								</th>
+								<th data-field="date_filed" class="center-align">
+									 Date Filed
+								</th>
+								<th data-field="actions" class="center-align">
+									 Actions
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+			              @foreach ($requests as $request)
+			                <tr>
+			                  <td>{{ trim($request->rfc_code) }}</td>
+			                  <td>{{ trim($request->rfc_name) }}</td>
+			                  <td>{{ trim($request->project_no) }}</td>
+			                  <td>{{ trim($request->lot_no) }}</td>
+			                  <td>{{ trim($request->rfc_scheme) }}</td>
+			                  <td>
+			                  	@if($request->rfc_alertdate)
+			                      {{ date('m/d/Y', strtotime(trim($request->rfc_alertdate))) }}
+			                    @endif
+			                  </td>
+			                  <td>
+			                  	@if($request->rfc_DOR)
+			                      {{ date('m/d/Y', strtotime(trim($request->rfc_DOR))) }}
+			                    @endif
+			                  </td>
+			                  <td>
+			                    <a href="{{ route('request.show', trim($request->rfc_code) ) }}">View</a>
+			                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
+			                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
+			                </tr>
+			              @endforeach
+			            </tbody>
+					</table>
+				</div>
 			</div>
-		</div>
+		@else
+          <div class="center-align">All taken cared of.</div>
+        @endif
 		<!-- End: Request Table -->
 
 		<!-- Pagination -->

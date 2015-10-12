@@ -40,6 +40,7 @@ class UserController extends Controller
             if(Auth::attempt(['app_email' => $request->input('username'),'password'  => $request->input('password')]))
             {
                 Auth::login(Auth::user(), true);
+                //Auth::user()->setAttribute('deparmentsssssss', 'monica'); //$this->getDepartment()
                 return Redirect::route('dashboard');        
             }
             else 
@@ -89,6 +90,20 @@ class UserController extends Controller
         return view('user.profile', $user);
     }
 
+     /**
+     * Gets the user's department.
+     *
+     * @return Response
+     */
+    public function getDepartment()
+    {   
+        $user_id = trim(Auth::user()->app_code);
+        $user = new User;
+        $department = $user->getDepartment($user_id);
+
+        return $department;
+    }
+    
     /**
      * Show the form for creating a new resource.
      *

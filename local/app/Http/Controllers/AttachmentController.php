@@ -31,12 +31,12 @@ class AttachmentController extends Controller
      * @return Response
      */
     
-    public function download($attachmentCode = '')
+    public function download($attachment_code = '')
     {
-        if ($attachmentCode)
+        if ($attachment_code)
         {
             $attachment = new Attachment;
-            echo $attachment->getAttachment($attachmentCode);
+            echo $attachment->getAttachment($attachment_code);
         }
         else
         {
@@ -56,7 +56,8 @@ class AttachmentController extends Controller
         {
             $attachment = new Attachment;
             $attachment->deleteAttachment($attachment_code);
-            return Redirect::back();
+            
+            return Redirect::back()->withErrors(['Attachment deleted.']);    
         }
         else{
             return Redirect::back()->withErrors(['Attachment code not indicated.']);  
@@ -76,7 +77,8 @@ class AttachmentController extends Controller
         {
             $attachment = new Attachment;
             $attachment->uploadAttachment($request->request_id, trim(Auth::user()->app_code));
-            return Redirect::back();
+            
+            return Redirect::back()->withErrors(['Attachment uploaded.']);    
         }
         else
         {

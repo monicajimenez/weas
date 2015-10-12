@@ -124,6 +124,13 @@ input[type=text]:disabled+label{
   font-size: 10px;
   padding: 5px;
 }
+
+ textarea.materialize-textarea:disabled+label, 
+ textarea.materialize-textarea[readonly="readonly"]+label,
+ textarea.materialize-textarea:disabled{
+  color:black;
+  height:auto;
+}
 /*End: Forms*/
 
 /*Profile Page*/

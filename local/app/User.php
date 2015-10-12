@@ -8,6 +8,9 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
+//additional includes
+use DB;
+
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract
 {
     use Authenticatable, CanResetPassword;
@@ -17,7 +20,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      *
      * @var string
      */
-    protected $table = 'dbo.approver';
+    protected $table = 'approver';
     protected $primaryKey = 'app_code';
     public $timestamps = false;
 
@@ -26,7 +29,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      *
      * @var array
      */
-    protected $fillable = ['firstname', 'lastname', 'department'];
+    /*protected $fillable = ['firstname', 'lastname', 'department'];*/
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -39,5 +42,15 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public function getAuthPassword() 
     {
         return $this->app_password;
+    }
+
+    public function getDepartment($user_id)
+    {
+        $department = $this->select('department.dept_name')
+                            ->where(['approver.app_code' => $user_id])
+                            ->join('department', 'department.dept_code', '=', 'approver.dept_code')
+                            ->first();
+                            
+        return $department;
     }
 }
