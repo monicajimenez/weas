@@ -9,17 +9,18 @@ use App\Http\Controllers\Controller;
 
 //additional includes
 use App\EASRequest;
-use Session;
-use DB;
 use Input;
 use Auth;
 use Form;
+use Redirect;
 
 class RequestController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param String request_status
+     * @param Request inputs
      * @return Response
      */
     public function index( $request_status = '', Request $inputs )
@@ -45,6 +46,8 @@ class RequestController extends Controller
             $data['request_status_label'] = studly_case($data['request_status'] . '&nbsp;Requests'); 
         }
 
+
+        /*dd($data);*/
         // Generate View
         if( ($data['request_status'] == 'pending') || ($data['request_status'] == 'incoming') ||
             ($data['request_status'] == 'denied') || ($data['request_status'] == 'approved')  ||
@@ -55,7 +58,7 @@ class RequestController extends Controller
         }
         else
         {
-            echo 'page not found';
+            return Redirect::back()->withErrors(['Page not found.']); 
         } 
 
     }
@@ -84,7 +87,7 @@ class RequestController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $request_id
      * @return Response
      */
     public function show($request_id ='')
@@ -95,7 +98,7 @@ class RequestController extends Controller
             $EASRequest = new EASRequest;
             $user_id = trim(Auth::user()->app_code);
             $data = [];
-            $data['details'] = $EASRequest->getRequestDetails($request_id);
+            $data['details'] = $EASRequest->getRequestDetails($request_id, $user_id);
             $data['signed'] = 0;
             $precedingLevel = $data['details']['user_approver']['rfcline_level']-1;
             $data['authorize_to_sign'] = 0;
@@ -111,12 +114,11 @@ class RequestController extends Controller
                     $data['authorize_to_sign'] = 1;
                 }
             }
-    
             return view('request.details', $data);
         }
         else
         {
-            echo 'page not found';
+            return Redirect::back()->withErrors(['Page not found.']); 
         }
     }
 
@@ -136,22 +138,31 @@ class RequestController extends Controller
      *
      * @param  Request  $request
      * @param  int  $request_id
+     *
      * @return Response
      */
     public function update(Request $request, $request_id)
     {
         $approver_response = '';
 
-        if(Input::get('approver_response'))
+        if($request->input('approver_response'))
         {
-            $EASRequest = new EASRequest;
-            $user_id = trim(Auth::user()->app_code);
-            $EASRequest->updateRequest($request_id,Input::get('approver_response'),$user_id, $request->input('remarks'));
+            if($request->input('remarks'))
+            {
+                $EASRequest = new EASRequest;
+                $user_id = trim(Auth::user()->app_code);
+                $EASRequest->updateRequest($request_id,Input::get('approver_response'),$user_id, $request->input('remarks'));
 
-            $data = [];
-            $data['details'] = $EASRequest->getRequestDetails($request_id);
+                $data = [];
+                $data['details'] = $EASRequest->getRequestDetails($request_id, $user_id);
 
-            return view('request.details', $data);
+                return Redirect::back()->withErrors(['Request updated.']); 
+                //return view('request.details', $data); 
+            }
+            else
+            {
+                return Redirect::back()->withErrors(['Remarks is a required field.']); 
+            }
         }
     }
 

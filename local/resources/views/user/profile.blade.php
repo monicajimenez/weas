@@ -12,13 +12,13 @@
 				<div class="col s10 m5">
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="last_name" type="text" class="validate" value="{{$details->app_lname}}">
+							<input disabled id="last_name" type="text" class="validate" value="{{$details->app_lname}}">
 							<label for="last_name">Last Name</label>
 						</div>
 					</div>
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="first_name" type="text" class="validate" value="{{$details->app_fname}}">
+							<input disabled id="first_name" type="text" class="validate" value="{{$details->app_fname}}">
 							<label for="first_name">First Name</label>
 						</div>
 					</div>
@@ -38,19 +38,20 @@
 				<div class="col s10 m5 padding-left-25 hide-on-small-only">
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="position" type="text" class="validate" value="{{$details->app_position}}">
+							<input disabled id="position" type="text" class="validate" value="{{$details->app_position}}">
 							<label for="position">Position</label>
 						</div>
 					</div>
 					<div class="row">
-						<div id="department" class="input-field col s12">
-							<select>
+						<div class="input-field col s12">
+							<input disabled id="department" type="text" class="validate" value="{{$details->department}}">
+							<!-- <select>
 								<option value="" disabled selected>Choose your Department</option>
 								<option value="1">IT</option>
 								<option value="2">Finance</option>
 								<option value="3">HR</option>
-							</select>
-							<label>Department</label>
+							</select> -->
+							<label for="department">Department</label>
 						</div>
 					</div>
 					<div class="row">
@@ -63,7 +64,7 @@
 				<div class="col s10 m5 hide-on-med-and-up">
 					<div class="row">
 						<div class="input-field col s12">
-							<input id="position" type="text" class="validate" value="{{$details->app_position}}">
+							<input disabled id="position" type="text" class="validate" value="{{$details->app_position}}">
 							<label for="position">Position</label>
 						</div>
 					</div>

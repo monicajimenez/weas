@@ -4,8 +4,21 @@
 @section("content")
 <div class="row">
   <div class="col s12 m12">
+
+    <!-- View Error -->
+    <div class="row">
+      <div class="col s12 m12">
+        @if($errors->any())
+            @foreach($errors->all() as $error)
+              <p class="errors">{{$error}}</p>
+            @endforeach
+         @endif
+      </div>
+    </div>
+     <!-- End: View Error -->
+     
     <!-- Search Field -->
-    @if ($requests->count()>0)
+    @if ($requests->count()>0 || Input::get('search'))
     <div class="row">
       <div class="col s12 m3 right">
         <form action="{{ route('request.index', ['request_status' => $request_status]) }}" method="get">
@@ -69,8 +82,16 @@
                   <td>{{ trim($request->project_no) }}</td>
                   <td>{{ trim($request->lot_no) }}</td>
                   <td>{{ trim($request->rfc_scheme) }}</td>
-                  <td>{{ date('m/d/Y', strtotime(trim($request->rfc_alertdate))) }}</td>
-                  <td>{{ date('m/d/Y', strtotime(trim($request->rfc_DOR))) }}</td>
+                  <td>
+                    @if($request->rfc_alertdate)
+                      {{ date('m/d/Y', strtotime(trim($request->rfc_alertdate))) }}
+                    @endif
+                  </td>
+                  <td>
+                    @if($request->rfc_DOR)
+                      {{ date('m/d/Y', strtotime(trim($request->rfc_DOR))) }}
+                    @endif
+                  </td>
                   @if ( isset($request_table_status_column) && $request_table_status_column == 1 )
                     <td>{{ trim($request->rfc_stat) }}</td>
                   @endif
