@@ -80,8 +80,10 @@ class AttachmentController extends Controller
             
             return Redirect::back()->withErrors(['Attachment uploaded.']);    
         }
-
-        return Redirect::back()->withErrors(['No file attached.']);     
+        else
+        {
+            return Redirect::back()->withErrors(['No file attached.']);    
+        } 
     }
 
     /**
@@ -97,8 +99,10 @@ class AttachmentController extends Controller
             $attachment = new Attachment;
             $attachment->showAttachment($id);
         }
-        
-        return Redirect::back()->withErrors(['Attachment code not indicated.']);
+        else
+        {
+            return Redirect::back()->withErrors(['Attachment code not indicated.']);
+        }
     }
 
     /**

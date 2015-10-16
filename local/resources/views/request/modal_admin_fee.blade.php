@@ -50,12 +50,12 @@
 	      <div class="modal-footer">
 	        <h5>Add admin fee?</h5>
 	        <p>
-	        	<input name="admin_flag" type="radio" id="admin_flag_yes" value="Y" checked onclick="jQuery('.admin_fee_values').show();jQuery('#add_admin_fee').show();"/>
+	        	<input name="admin_flag" type="radio" id="admin_flag_yes" value="Y" checked/>
 	      		<label for="admin_flag_yes">Yes</label>
-	          	<input name="admin_flag" type="radio" selected id="admin_flag_no" value="N" onclick="jQuery('.admin_fee_values').hide();jQuery('#add_admin_fee').hide();" />
+	          	<input name="admin_flag" type="radio" selected id="admin_flag_no" value="N" />
 	      		<label for="admin_flag_no">No</label>
 	        </p>
-	        <p class="admin_fee_values">
+	        <p>
 	        	<input name="amount" type="text" class="validate" value="">
 	             <label for="amount">Amount</label>
 
