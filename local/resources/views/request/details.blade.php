@@ -218,9 +218,9 @@
         </a>
         <ul>
           <li><a class="btn-floating btn-small waves-effect waves-light modal-trigger" href="#modal_attachments"><i class="material-icons">description</i></a></li>
-          @if(str_contains(trim($details->rfc_code),'RFC'))
+          <!-- @if(str_contains(trim($details->rfc_code),'RFC'))
             <li><a class="btn-floating btn-small waves-effect purple modal-trigger" href="#modal_admin_fee"><i class="material-icons">perm_identity</i></a></li>
-          @endif
+          @endif -->
           @if(isset($signed) && isset($authorize_to_sign) && $signed == '0' && $authorize_to_sign == 1)
             @if( trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-Hold')
               <li><button type="submit" name="approver_response" value="Denied" class="btn-floating btn-small waves-effect waves-light red"><i class="material-icons">thumb_down</i></button></li>
