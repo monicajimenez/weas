@@ -21,7 +21,7 @@ class AdminFeeController extends Controller
     public function index()
     {
         //
-    }
+    }   
 
     /**
      * Show the form for creating a new resource.
@@ -44,12 +44,19 @@ class AdminFeeController extends Controller
         if( $inputs->admin_flag && $inputs->amount && $inputs->remarks && $inputs->request_id)
         {
             $adminfee = new AdminFee;
-            $adminfee->addAdminFee($inputs->admin_flag, $inputs->amount, $inputs->remarks, $inputs->request_id, trim(Auth::user()->app_code));
-        }
-        else
-        {
-            return Redirect::back()->withErrors(['All inputs are required for saving an admin fee.']); 
-        }
+            
+            if($adminfee->addAdminFee($inputs->admin_flag, $inputs->amount, 
+                                      $inputs->remarks, $inputs->request_id, 
+                                      trim(Auth::user()->app_code))
+            )
+            {
+                return Redirect::back()->withErrors(['Admin fee added.']); 
+            }
+            
+            return Redirect::back()->withErrors(['Admin fee not added. Check your inputs.']); 
+        } 
+        
+        return Redirect::back()->withErrors(['All inputs are required for saving an admin fee.']); 
     }
 
     /**
