@@ -9,7 +9,7 @@ use DB;
 
 class EASRequest extends Model
 {
-    protected $table = 'dbo.rfc';
+    protected $table = 'rfc';
     protected $primaryKey = 'rfc_code';
     public $timestamps = false;
 
