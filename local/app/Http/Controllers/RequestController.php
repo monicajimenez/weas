@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 //additional includes
+use App\Http\Controllers\EmailController;
 use App\EASRequest;
 use Input;
 use Auth;
@@ -32,8 +33,18 @@ class RequestController extends Controller
         $data['request_status_label'] = '';
         $data['request_table_status_column'] = 0;
         $data['search'] = $inputs->search;
-        $user_id = trim(Auth::user()->app_code);
-        $data['requests'] = $EASRequest->getRequest($user_id, $data['request_status'], $data['search']);
+
+        //Retrieval of Requests
+        $data['requests'] = $EASRequest->getRequest( '' , $data['request_status'], $data['search']);
+
+        //Retrieve requests count
+        $data['total'] = $EASRequest->getRequestStatistics('', $data['request_status']);
+
+        //Check if with error then redirect back if any.
+        if(!$data['requests'])
+        {
+            return Redirect::back()->withErrors(['Page not found.']);
+        }
 
         // Format Data
         if( $data['request_status'] == 'all' )
@@ -46,8 +57,6 @@ class RequestController extends Controller
             $data['request_status_label'] = studly_case($data['request_status'] . '&nbsp;Requests'); 
         }
 
-
-        /*dd($data);*/
         // Generate View
         if( ($data['request_status'] == 'pending') || ($data['request_status'] == 'incoming') ||
             ($data['request_status'] == 'denied') || ($data['request_status'] == 'approved')  ||
@@ -92,7 +101,6 @@ class RequestController extends Controller
      */
     public function show($request_id ='')
     {
-
         if($request_id)
         {
             $EASRequest = new EASRequest;
@@ -151,10 +159,18 @@ class RequestController extends Controller
             {
                 $EASRequest = new EASRequest;
                 $user_id = trim(Auth::user()->app_code);
-                $EASRequest->updateRequest($request_id,Input::get('approver_response'),$user_id, $request->input('remarks'));
+                $approver_response = Input::get('approver_response');
 
+                //Update the
+                $EASRequest->updateRequest($request_id, $approver_response, $user_id, $request->input('remarks'));
+
+                //Get updated details
                 $data = [];
                 $data['details'] = $EASRequest->getRequestDetails($request_id, $user_id);
+
+                //Email Appropriate recipients
+                $mail = new EmailController;
+                $mail->send($data['details'], $approver_response);
 
                 return Redirect::back()->withErrors(['Request updated.']); 
                 //return view('request.details', $data); 

@@ -91,3 +91,18 @@ Route::group(['as' => 'attachment.'], function () {
             ]);
 });
 /*End: Attachments*/
+
+/*Mail*/
+Route::group(['as' => 'mail.'], function () {
+    Route::get('mail/pending/{request_id}/{user_id}', [
+               'as' => 'pending', 
+               'uses' => 'EmailController@send'
+            ]);
+});
+/*End: Mail*/
+
+/*Admin Fee*/
+Route::resource('adminfee', 'AdminFeeController', [
+    'middleware' => 'auth.user'
+]);
+/*End: Admin Fee*/

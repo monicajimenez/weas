@@ -1,6 +1,6 @@
 @extends("layouts/master")
 @section('sitetitle',  $request_status_label)
-@section('pagetitle', $request_status_label)
+@section('pagetitle', $request_status_label.'<em>Total: '.$total.'</em>')
 @section("content")
 <div class="row">
   <div class="col s12 m12">
@@ -16,7 +16,7 @@
       </div>
     </div>
      <!-- End: View Error -->
-     
+
     <!-- Search Field -->
     @if ($requests->count()>0 || Input::get('search'))
     <div class="row">

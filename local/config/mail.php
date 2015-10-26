@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', '192.168.2.54'),
+    'host' => env('MAIL_HOST', 'smtp.gmail.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'port' => env('MAIL_PORT', 25),
+    'port' => env('MAIL_PORT', 587),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'from' => ['address' => 'No-Reply@aboitiz.com', 'name' => 'EAS'],
+    'from' => ['address' => 'maria.monica.jimenez@aboitiz.com', 'name' => 'EAS'],
 
     /*
     |--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return [
     |
     */
 
-    //'username' => env('MAIL_USERNAME', 'aboitiz.com'),
+    'username' => env('MAIL_USERNAME', 'maria.monica.jimenez@aboitiz.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return [
     |
     */
 
-    //'password' => env('MAIL_PASSWORD'),
+    'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
@@ -119,6 +119,6 @@ return [
     |
     */
 
-    'pretend' => false,
+    'pretend' => true,
 
 ];

@@ -23,10 +23,6 @@ nav{
   margin-top:10px;
 }
 
-.page-title{
-  font-size: 35px;
-}
-
 .page-footer .row{
 margin-bottom: 0px;
 }
@@ -45,6 +41,23 @@ margin-bottom: 0px;
   font-weight: 900;
 }
 /*End: Card*/
+
+/*Page Title*/
+header div.row {
+  margin-bottom: 0px;
+}
+
+.page-title{
+  font-size: 35px;
+}
+
+.page-title em {
+  font-size: 18px;
+  float: right;
+  padding-right: 10px;
+}
+
+/*End: Page Title*/
 
 /*Tables*/
 td, th{
@@ -166,3 +179,12 @@ footer.page-footer .footer-copyright{
   font-size: 13px;
   font-style: italic;
 }
+/*End: User Created General Classes*/
+
+/*Width*/
+@media only screen and (min-width: 993px) {
+    .container {
+        width: 92%
+    }
+}
+/*End: Width*/

@@ -9,6 +9,13 @@
 			<div class="col s12 m10 right">
 				<div id="card-stats">
 				    <div class="row">
+						<!-- View Errors -->
+					    @if($errors->any())
+					    	@foreach($errors->all() as $error)
+					          <p class="errors">{{$error}}</p>
+					        @endforeach
+					    @endif
+				    	<!-- End: View Errors -->
 					    @foreach ($statistics as $data)
 				        	<div class="col s12 m6 l3">
 					        	<div class="card">

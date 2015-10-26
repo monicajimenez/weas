@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class MailController extends Controller
+//additional includes
+use App\Email;
+use Auth;
+
+class EmailController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,6 +21,21 @@ class MailController extends Controller
     public function index()
     {
         //
+    }
+
+    /**
+     * Send email to approvers.
+     * 
+     * @return Response
+     */
+    public function send( $request_details, $approver_response)
+    {
+        $mail = new Email;
+        $user_id = trim(Auth::user()->app_code);
+
+        $recipients = $mail->sendMail($request_details, $approver_response, $user_id);
+
+        return true;
     }
 
     /**
