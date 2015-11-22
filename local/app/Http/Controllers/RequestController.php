@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 
 //additional includes
 use App\Http\Controllers\EmailController;
+use App\Project;
+use App\RequestTypeApprover;
 use App\EASRequest;
 use Input;
 use Auth;
@@ -77,9 +79,25 @@ class RequestController extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function create($request_type = '')
     {
-        //
+        //Initialization
+        $projects = new Project;
+        $EASRequest = new EASRequest;
+        $RequestTypeApprover = new RequestTypeApprover;
+        $data['request_type'] = $request_type;
+        $user_id = trim(Auth::user()->app_code);
+
+        //Retrieve user granted projects
+        $data['projects'] = $projects->getProjects($user_id, $request_type, '3');
+
+        //Additional variables for RFR
+        if($request_type == 'RFR')
+        {
+            $data['rfc_refs'] = $EASRequest->getRequest( '', 'all', '');
+        }
+        
+        return view('request.file', $data);
     }
 
     /**
@@ -171,9 +189,8 @@ class RequestController extends Controller
                 //Email Appropriate recipients
                 $mail = new EmailController;
                 $mail->send($data['details'], $approver_response);
-
-                return Redirect::back()->withErrors(['Request updated.']); 
-                //return view('request.details', $data); 
+                
+                return Redirect::back()->withErrors(['Request updated.']);
             }
             else
             {
@@ -185,7 +202,7 @@ class RequestController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int  $id
      * @return Response
      */
     public function destroy($id)

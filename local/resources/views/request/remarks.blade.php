@@ -1,5 +1,5 @@
 <div id="remarks" class="row">
-	<div class="col s12 m12">
+	<div class="col s10 m10">
 	  <h5>Remarks:</h5>
 	  <div class="row">
 	    <div class="input-field col s12 m12">

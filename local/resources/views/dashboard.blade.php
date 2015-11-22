@@ -67,20 +67,20 @@
 		<!-- Table Label -->
 		<div class="row">
 			<div class="col s11 m10 right">
-				<h5 class="left-align">Unsigned Pending Requests 
-					@if(count($requests) > 0)
+				<h5 class="left-align">Unsigned Requests
+					@if($statistics_unsigned->total > 0)
 						<em class="red-text">({{$statistics_unsigned->total}})</em>
 					@endif
 				</h5>
 			</div>
 		</div>
 		<!-- End: Table Label -->
-		
-		<!-- Search Field -->
-	    @if ($requests->count()>0 || Input::get('search'))
+
+    	<!-- Search Field -->
+	    @if($statistics_unsigned->total > 0)
 	    <div class="row">
-	      <div class="col s12 m3 right">
-	        <form action="{{ route('dashboard') }}" method="get">
+	      <div class="col s12 m3 right">	
+	        <form action="<?php route('dashboard') ?>" method="get">
 	          <div class="input-field">
 	            <input type="search" id="search-field" class="field" required maxlength="" name="search">
 	            <label for="search-field"><i class="mdi-action-search"></i></label>
@@ -92,79 +92,171 @@
 	    @endif
 	    <!-- End: Search Field -->
 
-		<!-- Request Table -->
-		 @if ($requests->count()>0)
-			<div class="row">
-				<div class="col s12 m10 right">
-					<table class="responsive-table hoverable">
-						<thead class="">
-							<tr>
-								<th data-field="code" class="center-align">
-									 Code
-								</th>
-								<th data-field="owners_name" class="center-align">
-									 Owner's Name
-								</th>
-								<th data-field="project_name" class="center-align">
-									 Project Name
-								</th>
-								<th data-field="lot_code" class="center-align">
-									 Lot Code
-								</th>
-								<th data-field="payment_scheme" class="center-align">
-									 Payment Scheme
-								</th>
-								<th data-field="qualification_date" class="center-align">
-									 Qualification Date
-								</th>
-								<th data-field="date_filed" class="center-align">
-									 Date Filed
-								</th>
-								<th data-field="actions" class="center-align">
-									 Actions
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-			              @foreach ($requests as $request)
-			                <tr>
-			                  <td>{{ trim($request->rfc_code) }}</td>
-			                  <td>{{ trim($request->rfc_name) }}</td>
-			                  <td>{{ trim($request->project_no) }}</td>
-			                  <td>{{ trim($request->lot_no) }}</td>
-			                  <td>{{ trim($request->rfc_scheme) }}</td>
-			                  <td>
-			                  	@if($request->rfc_alertdate)
-			                      {{ date('m/d/Y', strtotime(trim($request->rfc_alertdate))) }}
-			                    @endif
-			                  </td>
-			                  <td>
-			                  	@if($request->rfc_DOR)
-			                      {{ date('m/d/Y', strtotime(trim($request->rfc_DOR))) }}
-			                    @endif
-			                  </td>
-			                  <td>
-			                    <a href="{{ route('request.show', trim($request->rfc_code) ) }}">View</a>
-			                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
-			                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
-			                </tr>
-			              @endforeach
-			            </tbody>
-					</table>
-				</div>
-			</div>
-		@else
-          <div class="center-align">All taken cared of.</div>
-        @endif
-		<!-- End: Request Table -->
+		<!-- TABS -->
+		<div class="row">
+		    <div class="col s12 m10 right">
+		      <ul class="tabs">
+		        <li class="tab col s3"><a class="active" href="#unsignedPendingRequestTab">Unsigned Pending Requests</a></li>
+		        <li class="tab col s3"><a href="#unsignedOnHoldRequestTab">Unsigned On-Hold Requests</a></li>
+		      </ul>
+		    </div>
+		    <!-- Unsigned Pending Request Tab -->
+		    <div id="unsignedPendingRequestTab" class="row">
 
-		<!-- Pagination -->
-		<div class="col s12 m10 right">
-			<ul class="pagination right">
-				 <?php echo $requests->render(); ?>
-			</ul>
-		</div>
-		<!-- End: Pagination -->
+		    	<!-- Request Table -->
+				 @if ($pending_requests->count()>0)
+					<div class="row">
+						<div class="col s12 m10 right">
+							<table class="responsive-table hoverable">
+								<thead class="">
+									<tr>
+										<th data-field="code" class="center-align">
+											 Code
+										</th>
+										<th data-field="owners_name" class="center-align">
+											 Owner's Name
+										</th>
+										<th data-field="project_name" class="center-align">
+											 Project Name
+										</th>
+										<th data-field="lot_code" class="center-align">
+											 Lot Code
+										</th>
+										<th data-field="payment_scheme" class="center-align">
+											 Payment Scheme
+										</th>
+										<th data-field="qualification_date" class="center-align">
+											 Qualification Date
+										</th>
+										<th data-field="date_filed" class="center-align">
+											 Date Filed
+										</th>
+										<th data-field="actions" class="center-align">
+											 Actions
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+					              @foreach ($pending_requests as $pending_request)
+					                <tr>
+					                  <td>{{ trim($pending_request->rfc_code) }}</td>
+					                  <td>{{ trim($pending_request->rfc_name) }}</td>
+					                  <td>{{ trim($pending_request->project_no) }}</td>
+					                  <td>{{ trim($pending_request->lot_no) }}</td>
+					                  <td>{{ trim($pending_request->rfc_scheme) }}</td>
+					                  <td>
+					                  	@if($pending_request->rfc_alertdate)
+					                      {{ date('m/d/Y', strtotime(trim($pending_request->rfc_alertdate))) }}
+					                    @endif
+					                  </td>
+					                  <td>
+					                  	@if($pending_request->rfc_DOR)
+					                      {{ date('m/d/Y', strtotime(trim($pending_request->rfc_DOR))) }}
+					                    @endif
+					                  </td>
+					                  <td>
+					                    <a href="{{ route('request.show', trim($pending_request->rfc_code) ) }}">View</a>
+					                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
+					                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
+					                </tr>
+					              @endforeach
+					            </tbody>
+							</table>
+						</div>
+					</div>
+				@else
+		          <div class="center-align">All taken cared of.</div>
+		        @endif
+				<!-- End: Request Table -->
+
+				<!-- Pagination -->
+				<div class="col s12 m10 right">
+					<ul class="pagination right">
+						<?php echo $pending_requests->setPageName('pending_request_page'); ?>
+					</ul>
+				</div>
+				<!-- End: Pagination -->
+		    </div>
+		    <!-- End: Unsigned Pending Request Tab -->
+		    <!-- Unsigned On-Hold Request Tab -->
+		   	<div id="unsignedOnHoldRequestTab" class="row">
+		    	<!-- Request Table -->
+				 @if ($onhold_requests->count()>0)
+					<div class="row">
+						<div class="col s12 m10 right">
+							<table class="responsive-table hoverable">
+								<thead class="">
+									<tr>
+										<th data-field="code" class="center-align">
+											 Code
+										</th>
+										<th data-field="owners_name" class="center-align">
+											 Owner's Name
+										</th>
+										<th data-field="project_name" class="center-align">
+											 Project Name
+										</th>
+										<th data-field="lot_code" class="center-align">
+											 Lot Code
+										</th>
+										<th data-field="payment_scheme" class="center-align">
+											 Payment Scheme
+										</th>
+										<th data-field="qualification_date" class="center-align">
+											 Qualification Date
+										</th>
+										<th data-field="date_filed" class="center-align">
+											 Date Filed
+										</th>
+										<th data-field="actions" class="center-align">
+											 Actions
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+					              @foreach ($onhold_requests as $onhold_request)
+					                <tr>
+					                  <td>{{ trim($onhold_request->rfc_code) }}</td>
+					                  <td>{{ trim($onhold_request->rfc_name) }}</td>
+					                  <td>{{ trim($onhold_request->project_no) }}</td>
+					                  <td>{{ trim($onhold_request->lot_no) }}</td>
+					                  <td>{{ trim($onhold_request->rfc_scheme) }}</td>
+					                  <td>
+					                  	@if($onhold_request->rfc_alertdate)
+					                      {{ date('m/d/Y', strtotime(trim($onhold_request->rfc_alertdate))) }}
+					                    @endif
+					                  </td>
+					                  <td>
+					                  	@if($onhold_request->rfc_DOR)
+					                      {{ date('m/d/Y', strtotime(trim($onhold_request->rfc_DOR))) }}
+					                    @endif
+					                  </td>
+					                  <td>
+					                    <a href="{{ route('request.show', trim($onhold_request->rfc_code) ) }}">View</a>
+					                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
+					                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
+					                </tr>
+					              @endforeach
+					            </tbody>
+							</table>
+						</div>
+					</div>
+				@else
+		          <div class="center-align">All taken cared of.</div>
+		        @endif
+				<!-- End: Request Table -->
+
+				<!-- Pagination -->
+				<div class="col s12 m10 right">
+					<ul class="pagination right">
+						<?php echo $onhold_requests->setPageName('onhold_request_page'); ?>
+					</ul>
+				</div>
+				<!-- End: Pagination -->
+		    </div>
+		    <!-- End: Unsigned On-Hold Request Tab -->
+		 </div>
+		<!-- End: TABS -->
 
 		<!-- Modal Structure -->
         <div id="modal_action" class="modal">
@@ -191,6 +283,7 @@
           </div>
         </div>
 	      <!-- End: Modal Structure -->
+
 		<!-- End: Requests Table Container-->
 	</div>
 </div>

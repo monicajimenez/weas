@@ -34,6 +34,8 @@ class DashboardController extends Controller
 
         //Retrieving Data
         $data['requests'] = $EASRequest->getRequest($user_id, $data['request_status'], $data['search']);
+        $data['pending_requests'] = $data['requests']['pending_requests'];
+        $data['onhold_requests'] = $data['requests']['onhold_requests'];
         $data['statistics'] = $EASRequest->getRequestStatistics($user_id);
         $data['statistics_unsigned'] = $EASRequest->getUnsignedRequestStatistics($user_id);
 

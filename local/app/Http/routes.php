@@ -20,7 +20,7 @@ Route::controllers([
 /*End: Authentication*/
 
 /*Dashboard*/
-Route::get('dashboard', [
+Route::get('dashboard/', [
     'as' => 'dashboard',
     'middleware' => 'auth.user', 
     'uses' => 'DashboardController@index'
@@ -67,6 +67,12 @@ Route::get('request/update/{request_id})',
     'middleware' => 'auth.user', 
     'uses' => 'RequestController@update'
 ]);
+Route::get('request/create/{request_type})', 
+[
+    'as' => 'request.create',
+    'middleware' => 'auth.user', 
+    'uses' => 'RequestController@create'
+]);
 /*End: Requests*/
 
 /*Attachments*/
@@ -106,3 +112,9 @@ Route::resource('adminfee', 'AdminFeeController', [
     'middleware' => 'auth.user'
 ]);
 /*End: Admin Fee*/
+
+/*Request Type Approver*/
+Route::post('RequestTypeApprover/getRequestApprover', [
+    'as' => 'getrequesttypeapprovers', 'uses' => 'RequestTypeApproverController@getRequestApprover'
+]);
+/*End:Request Type Approver*/

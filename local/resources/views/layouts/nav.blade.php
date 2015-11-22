@@ -70,12 +70,33 @@
                       <a class="collapsible-header waves-effect waves-teal"><i class="material-icons">work</i>Requests</a>
                       <div class="collapsible-body" style="display: block;">
                         <ul>
-                          <li class=""><a href="{{ route('request.index', ['request_status' => 'pending']) }}">Pending Requests</a></li>
-                          <li class=""><a href="{{ route('request.index', ['request_status' => 'on-hold']) }}">On-Hold Requests</a></li>
-                          <li class=""><a href="{{ route('request.index', ['request_status' => 'reset']) }}">Reset Requests</a></li>
-                          <li><a href="{{ route('request.index', ['request_status' => 'approved']) }}">Approved Requests</a></li>
-                          <li><a href="{{ route('request.index', ['request_status' => 'denied']) }}">Denied Requests</a></li>
-                          <li><a href="{{ route('request.index', ['request_status' => 'all']) }}">All Request</a></li>
+                          <ul class="collapsible collapsible-accordion">
+                            <li>
+                              <a class="collapsible-header waves-effect waves-teal"><i class="material-icons">input</i>File</a>
+                              <div class="collapsible-body" style="display: block;">
+                                <ul>
+                                  <li class=""><a href="{{ route('request.create', ['request_type' => 'RFC']) }}">RFC</a></li>
+                                  <li class=""><a href="{{ route('request.create', ['request_type' => 'RFR']) }}">RFR</a></li>
+                                  <li class=""><a href="{{ route('request.create', ['request_type' => 'QAC']) }}">QAC</a></li>
+                                </ul>
+                              </div>
+                            </li>
+                          </ul>
+                          <ul class="collapsible collapsible-accordion">
+                            <li>
+                              <a class="collapsible-header waves-effect waves-teal"><i class="material-icons">search</i>View</a>
+                              <div class="collapsible-body" style="display: block;">
+                                <ul>
+                                  <li class=""><a href="{{ route('request.index', ['request_status' => 'pending']) }}">Pending</a></li>
+                                  <li class=""><a href="{{ route('request.index', ['request_status' => 'on-hold']) }}">On-Hold</a></li>
+                                  <li class=""><a href="{{ route('request.index', ['request_status' => 'reset']) }}">Reset</a></li>
+                                  <li><a href="{{ route('request.index', ['request_status' => 'approved']) }}">Approved</a></li>
+                                  <li><a href="{{ route('request.index', ['request_status' => 'denied']) }}">Denied</a></li>
+                                  <li><a href="{{ route('request.index', ['request_status' => 'all']) }}">All</a></li>
+                                </ul>
+                              </div>
+                            </li>
+                          </ul>
                         </ul>
                       </div>
                     </li>

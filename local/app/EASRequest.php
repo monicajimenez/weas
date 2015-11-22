@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 //additional includes
+use App\Project;
 use DB;
 
 class EASRequest extends Model
@@ -50,11 +51,21 @@ class EASRequest extends Model
         //Retrieve unsigned request by user
         else if($request_status == 'Unsigned')
         {
-            $data = $this->getUnsignedRequest($user_id, $search);
-            $requests = $data->paginate($paginationLenght,  
+            $pendingData = $this->getUnsignedRequest($user_id, $search, 'Pending');
+            $onHoldData = $this->getUnsignedRequest($user_id, $search, 'On-Hold');
+
+            $pendingRequests = $pendingData->paginate($paginationLenght,  
                                             ['rfc.rfc_code', 'rfc.rfc_name', 'rfc.project_no', 'rfc.lot_no', 'rfc.rfc_scheme',
-                                             'rfc.rfc_stat','rfc.rfc_DOR', 'rfc.rfc_alertdate']
-                                      ); 
+                                             'rfc.rfc_stat','rfc.rfc_DOR', 'rfc.rfc_alertdate'], 'pending_request_page'
+                                      );
+
+            $onHoldRequests = $onHoldData->paginate($paginationLenght,  
+                                            ['rfc.rfc_code', 'rfc.rfc_name', 'rfc.project_no', 'rfc.lot_no', 'rfc.rfc_scheme',
+                                             'rfc.rfc_stat','rfc.rfc_DOR', 'rfc.rfc_alertdate'], 'onhold_request_page'
+                                      );
+
+            $requests['pending_requests'] = $pendingRequests;
+            $requests['onhold_requests'] = $onHoldRequests;
         }
         //Retrieve all requests
         else
@@ -66,7 +77,7 @@ class EASRequest extends Model
         //Set pagination path
         if ($request_status == 'Unsigned')
         {
-            $requests->setPath(route('dashboard'));
+            $pendingRequests->setPath(route('dashboard'));
         }
         else
         {
@@ -148,7 +159,7 @@ class EASRequest extends Model
      * @param $user_id - (required) id of user
      * @return Response
      */
-    public function getUnsignedRequest($user_id = '', $search = '')
+    public function getUnsignedRequest($user_id = '', $search = '', $status = '')
     {
         //Retrieve all request ids assigned to current user
         $requestIDs = DB::select(
@@ -177,7 +188,7 @@ class EASRequest extends Model
                                 ON r.rfc_code = list.list_rfc_code
                                 WHERE list.list_app_code = '$user_id'
                                 AND list.list_previousStatus = 'Signed'
-                                AND list.list_stat = 'Pending';"
+                                AND list.list_stat = '$status';"
                             )
                         );
 
@@ -423,11 +434,13 @@ class EASRequest extends Model
                         ON r.rfc_code = list.list_rfc_code
                         WHERE list.list_app_code = '$user_id'
                         AND list.list_previousStatus = 'Signed'
-                        AND list.list_stat = 'Pending';"
+                        AND 
+                        (   list.list_stat = 'Pending' OR
+                            list.list_stat = 'On-Hold'
+                        )"
                     )
                 );
                 
         return $statistics[0];
     }
- 
 }

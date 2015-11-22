@@ -19,6 +19,11 @@ nav{
   background-color: #2196f3;
 }
 
+.side-nav .collapsible-body li.active a, .side-nav.fixed .collapsible-body li.active, .side-nav li:hover 
+{
+  color: black !important;
+}
+
 .divider{
   margin-top:10px;
 }
