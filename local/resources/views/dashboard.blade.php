@@ -64,7 +64,7 @@
 		<!-- End: Requests Statistics -->
 
 		<!-- Requests Table Container -->
-		<!-- Table Label -->
+		<!-- Request Table Label -->
 		<div class="row">
 			<div class="col s11 m10 right">
 				<h5 class="left-align">Unsigned Requests
@@ -74,7 +74,7 @@
 				</h5>
 			</div>
 		</div>
-		<!-- End: Table Label -->
+		<!-- End: Request Table Label -->
 
     	<!-- Search Field -->
 	    @if($statistics_unsigned->total > 0)
@@ -165,7 +165,11 @@
 						</div>
 					</div>
 				@else
-		          <div class="center-align">All taken cared of.</div>
+		          	<div class="row">
+			          	<div class="col s12 m10 right">
+							<div class="center-align">All taken cared of.</div>
+						</div>
+					</div>
 		        @endif
 				<!-- End: Request Table -->
 
@@ -242,7 +246,11 @@
 						</div>
 					</div>
 				@else
-		          <div class="center-align">All taken cared of.</div>
+		          	<div class="row">
+			          	<div class="col s12 m10 right">
+							<div class="center-align">All taken cared of.</div>
+						</div>
+					</div>
 		        @endif
 				<!-- End: Request Table -->
 
@@ -257,34 +265,91 @@
 		    <!-- End: Unsigned On-Hold Request Tab -->
 		 </div>
 		<!-- End: TABS -->
-
-		<!-- Modal Structure -->
-        <div id="modal_action" class="modal">
-          <div class="modal-content">
-          	<form>
-          		 <div id="remarks" class="row">
-			        <div class="col s12 m8">
-			          <h5>Remarks:</h5>
-			          <div class="row">
-			            <div class="input-field col s12 m10">
-			              <textarea id="remarks" class="materialize-textarea"></textarea>
-			              <label for="remarks">Input remarks.</label>
-			            </div>
-			          </div>
-			        </div>
-			      </div>
-          	</form>
-          </div>
-          <div style="clear:both;">
-          </div>
-          <div class="modal-footer">
-            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Back</a>
-            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Ok</a>
-          </div>
-        </div>
-	      <!-- End: Modal Structure -->
-
 		<!-- End: Requests Table Container-->
+
+		<!-- Requests Filed Request Container -->
+		<!-- Filed Request Table Label -->
+		<div class="row">
+			<div class="col s11 m10 right">
+				<h5 class="left-align">Filed Requests
+					@if(count($filed_requests) > 0)
+						<em class="red-text">({{count($filed_requests)}})</em>
+					@endif
+				</h5>
+			</div>
+		</div>
+		<!-- End: Filed Request Table Label -->
+
+		<div id="filed_request">
+			<!-- Request Table -->
+			 @if ($filed_requests->count()>0)
+				<div class="row">
+					<div class="col s12 m10 right">
+						<table class="responsive-table hoverable">
+							<thead class="">
+								<tr>
+									<th data-field="code" class="center-align">
+										 Code
+									</th>
+									<th data-field="project_name" class="center-align">
+										 Project Name
+									</th>
+									<th data-field="lot_code" class="center-align">
+										 Lot Code
+									</th>
+									<th data-field="payment_scheme" class="center-align">
+										 Payment Scheme
+									</th>
+									<th data-field="qualification_date" class="center-align">
+										 Qualification Date
+									</th>
+									<th data-field="date_filed" class="center-align">
+										 Date Filed
+									</th>
+									<th data-field="actions" class="center-align">
+										 Actions
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+				              @foreach ($filed_requests as $filed_request)
+				                <tr>
+				                  <td>{{ trim($filed_request->rfc_code) }}</td>
+				                  <td>{{ trim($filed_request->project_no) }}</td>
+				                  <td>{{ trim($filed_request->lot_no) }}</td>
+				                  <td>{{ trim($filed_request->rfc_scheme) }}</td>
+				                  <td>
+				                  	@if($filed_request->rfc_alertdate)
+				                      {{ date('m/d/Y', strtotime(trim($filed_request->rfc_alertdate))) }}
+				                    @endif
+				                  </td>
+				                  <td>
+				                  	@if($filed_request->rfc_DOR)
+				                      {{ date('m/d/Y', strtotime(trim($filed_request->rfc_DOR))) }}
+				                    @endif
+				                  </td>
+				                  <td>
+				                  <?php 
+				                  	$rfc_code = explode('-', trim($filed_request->rfc_code));
+				                  ?>
+				                    <a href="{{ route('request.show', trim($filed_request->rfc_code) ) }}">View</a>
+				                    <a href="{{ route('request.edit', ['request_id' => trim($filed_request->rfc_code), 'filing_type' => $rfc_code['0']]) }}">Edit</a>
+				                </tr>
+				              @endforeach
+				            </tbody>
+						</table>
+					</div>
+				</div>
+			@else
+	          	<div class="row">
+		          	<div class="col s12 m10 right">
+						<div class="center-align">All taken cared of.</div>
+					</div>
+				</div>
+	        @endif
+			<!-- End: Request Table -->
+		</div>
+		<!-- End Filed Request Table Container -->
 	</div>
 </div>
 @stop

@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Auth;  
 use Redirect;
+use Response;
 
 class UserController extends Controller
 {
@@ -102,6 +103,15 @@ class UserController extends Controller
         $department = $user->getDepartment($user_id);
 
         return $department;
+    }
+
+    public function getApprover()
+    {
+        $User = new User;
+
+        $approver = $User->getApprover();
+
+        return Response::json($approver);
     }
     
     /**

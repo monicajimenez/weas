@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 //additional includes
 use App\Project;
 use DB;
+use App\EASRequestApprover;
 
 class EASRequest extends Model
 {
@@ -20,11 +21,18 @@ class EASRequest extends Model
 
     }
 
+    //Overriden function
+    protected function insertAndSetId( \Illuminate\Database\Eloquent\Builder $query, $attributes)
+    {
+        $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
+    }
+
     /**
      * Retrieves a list of requests
      *
      * @param user_id - not empty when request that needs to be retrieve is that of the user only.
-     * @param request_status - may be 'all' or that of a specific request.
+     * @param request_status - (required) may be 'all' (used for filing requests and retrieving the RFC reference) 
+     *                      or that of a specific request ('Unsigned', 'Pending', 'Approved').
      * @param search - not empty when user uses the search functionality in request list.
      * @return Response
      */
@@ -51,21 +59,32 @@ class EASRequest extends Model
         //Retrieve unsigned request by user
         else if($request_status == 'Unsigned')
         {
-            $pendingData = $this->getUnsignedRequest($user_id, $search, 'Pending');
-            $onHoldData = $this->getUnsignedRequest($user_id, $search, 'On-Hold');
+            $pending_requests = $this->getUnsignedRequest($user_id, $search, 'Pending');
+            $onhold_requests = $this->getUnsignedRequest($user_id, $search, 'On-Hold');
+            $filed_requests = $this->getUnsignedFiledRequest($user_id);
 
-            $pendingRequests = $pendingData->paginate($paginationLenght,  
+            $pending_requests = $pending_requests->paginate($paginationLenght,  
                                             ['rfc.rfc_code', 'rfc.rfc_name', 'rfc.project_no', 'rfc.lot_no', 'rfc.rfc_scheme',
                                              'rfc.rfc_stat','rfc.rfc_DOR', 'rfc.rfc_alertdate'], 'pending_request_page'
                                       );
 
-            $onHoldRequests = $onHoldData->paginate($paginationLenght,  
-                                            ['rfc.rfc_code', 'rfc.rfc_name', 'rfc.project_no', 'rfc.lot_no', 'rfc.rfc_scheme',
-                                             'rfc.rfc_stat','rfc.rfc_DOR', 'rfc.rfc_alertdate'], 'onhold_request_page'
-                                      );
+            $onhold_requests = $onhold_requests->paginate($paginationLenght,  
+                                                    ['rfc.rfc_code', 'rfc.rfc_name', 'rfc.project_no', 
+                                                     'rfc.lot_no', 'rfc.rfc_scheme', 'rfc.rfc_stat',
+                                                     'rfc.rfc_DOR', 'rfc.rfc_alertdate'], 
+                                                    'onhold_request_page'
+                                                    );
 
-            $requests['pending_requests'] = $pendingRequests;
-            $requests['onhold_requests'] = $onHoldRequests;
+            $filed_requests = $filed_requests->paginate($paginationLenght,  
+                                                      ['rfc.rfc_code', 'rfc.project_no', 'rfc.lot_no', 
+                                                       'rfc.rfc_scheme', 'rfc.rfc_DOR', 'rfc.rfc_alertdate'],
+                                                       'filed_request_page'
+                                                      );
+
+            $requests['pending_requests'] = $pending_requests;
+            $requests['onhold_requests'] = $onhold_requests;
+            $requests['filed_requests'] = $filed_requests;
+
         }
         //Retrieve all requests
         else
@@ -77,7 +96,7 @@ class EASRequest extends Model
         //Set pagination path
         if ($request_status == 'Unsigned')
         {
-            $pendingRequests->setPath(route('dashboard'));
+            $pending_requests->setPath(route('dashboard'));
         }
         else
         {
@@ -132,7 +151,6 @@ class EASRequest extends Model
                                     ->orWhere('rfc_stat', 'LIKE', '%'.$search.'%');
                             });
             }
-            
         } 
         //Retrieve all specifc requests
         else
@@ -157,6 +175,7 @@ class EASRequest extends Model
      * Retrieves a list of unsigned user requests
      *
      * @param $user_id - (required) id of user
+     * @param $status - (required) Values: 'Pending', 'On-Hold'
      * @return Response
      */
     public function getUnsignedRequest($user_id = '', $search = '', $status = '')
@@ -296,14 +315,16 @@ class EASRequest extends Model
                                 ->whereNotNull('rfc.bank_code')
                                 ->first();
         $details->approvers = $this->select('approver.app_fname', 'approver.app_lname', 'approver.app_position', 'approver.app_code',
-                                    'rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 'rfc_line.rfcline_remarks','closing.close_desc')
+                                    'rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 'rfc_line.rfcline_remarks','closing.close_desc',
+                                    'closing.close_code')
                                     ->where(['rfc.rfc_code' => $request_id])
                                     ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
                                     ->join('approver', 'approver.app_code', '=', 'rfc_line.app_code')
                                     ->join('closing', 'closing.close_code', '=', 'rfc_line.close_code')
                                     ->orderBy('rfc_line.rfcline_level')
                                     ->get();
-        $details->user_approver = $this->select('rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 'rfc_line.rfcline_remarks','rfc_line.close_code')
+        $details->user_approver = $this->select('rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 'rfc_line.rfcline_remarks','rfc_line.close_code',
+                                                'rfc_line.rfcline_A', 'rfc_line.rfcline_B', 'rfc_line.rfcline_C', 'rfc_line.rfcline_D', 'rfc_line.rfcline_Others')
                                     ->where(['rfc_line.rfc_code' => $request_id, 'rfc_line.app_code' => $user_id])
                                     ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
                                     ->first();
@@ -333,12 +354,12 @@ class EASRequest extends Model
      * @param $remarkds - (required) 
      * @return Response
      */
-    public function updateRequest($request_id, $approver_response, $user_id, $remarks='')
+    public function respondRequest($request_id, $approver_response, $user_id, $remarks='')
     {
         //Update rfc_line table to reflect the user's specific response
         DB::table('rfc_line')->where(['rfc_code' => $request_id, 'app_code' => $user_id])->update(['rfcline_stat' => $approver_response, 'rfcline_remarks' => $remarks]);
         
-        //Initialization of need variables in order to update rfc table
+        //Initialization of needed variables in order to update rfc table
         $approvers_level = DB::table('rfc_line')->where(['rfc_code' => $request_id, 'app_code' => $user_id])->first(['rfcline_level']);
         $max_level = DB::table('rfc_line')->where(['rfc_code' => $request_id])->max('rfcline_level');
 
@@ -350,6 +371,96 @@ class EASRequest extends Model
             }   
 
             $this->where(['rfc_code' => $request_id])->update(['rfc_stat' => $approver_response]);    
+        }
+    }
+
+    /**
+     * Updates the request depending on the changes made
+     *
+     * @param $request_id - (required)
+     * @param $user_id (required)
+     * @param $data - (required) 
+     * @param $request_type - (required) Values: 'RFR', 'RFC' or 'QAC'
+     * @return Response
+     */
+    public function updateRequest($request_id, $user_id, $data, $request_type)
+    {
+        $EASRequestApprover = new EASRequestApprover;
+
+        //Get value of remarks from user input
+        if($request_type == 'RFC')
+        {
+            $remarks = $data['req_note'];
+        }
+        else if($request_type == 'RFR' || $request_type == 'QAC')
+        {
+            $remarks = $data['remarks'];
+        }
+
+        //Update rfc_line table to reflect the user new response
+        DB::table('rfc_line')->where(['rfc_code' => $request_id, 'app_code' => $user_id])->update(['rfcline_remarks' => $remarks]);
+        
+        //Update actual request with new values
+        $user = $this->find($request_id);
+
+        //Get request code depending on the request type except for RFCs
+        //Assign the corresponding request_code depending on what is filed
+        if( $request_type == 'QAC')
+        {
+            $user->req_code ='Req-021';
+            $user->rfc_scheme = $data['payment_scheme'];
+            $user->rfc_contamt = (float)str_replace(',','',$data['contract_amount']);
+        }
+        else if( $request_type == 'RFR')
+        {
+            $user->re_reasons = $data['reasons'];
+
+            if( $data['nature_of_reopening'] == 'forfeiture')
+            {
+                $user->re_nature = 'Forfeiture';
+                $user->re_first = date('m/d/Y', strtotime($data['first_reminder']));
+                $user->re_second = date('m/d/Y', strtotime($data['second_reminder']));
+                $user->re_notice = date('m/d/Y', strtotime($data['notice_of_forfeiture']));
+                $user->re_amort = $data['number_of_amortization_paid'];
+                /*must have Due Date and Date Received*/
+            }
+            else
+            {
+                $nature_and_req_code  = explode(':', $data['rfc_ref_no']);
+                $user->rfc_refno = $nature_and_req_code[0]; 
+                $user->re_nature = 'RFC - ' . $nature_and_req_code[1];
+            }
+        }
+        else if( $request_type == 'RFC')
+        {
+            $user->rfc_from = $data['from'];
+            $user->rfc_to = $data['to'];
+            $user->rfc_scheme = $data['payment_scheme'];
+            $user->rfc_note = $remarks;
+        }
+
+        $user->project_no = $data['project_type'];
+        $user->rfc_model = $data['model_type'];
+        $user->lot_no = $data['lot_code'];
+        $user->rfc_landarea = $data['lot_area']; /*to check*/
+        $user->rfc_floorarea = $data['floor_area'];
+        $user->rfc_name = $data['owners_name']; /*to check*/
+        $user->sales_date = date('Y-m-d', strtotime($data['date_reserved']));
+
+        //Save request
+        $user->save();
+
+        //Save approver
+        if( $data['filing_type'] == 'RFC')
+        {
+            $EASRequestApprover->saveRequestApprovers($user->req_code, $request_id, $data['approvers'], 
+                                                    $data['close_codes'], $remarks, $data['attachment_type'],
+                                                    $data['other_attachment']);
+        }
+        else
+        {
+            $EASRequestApprover->saveRequestApprovers($user->req_code, $request_id, $data['approvers'], 
+                                                    $data['close_codes'], $remarks);
         }
     }
 
@@ -442,5 +553,151 @@ class EASRequest extends Model
                 );
                 
         return $statistics[0];
+    }
+
+    /**
+     * Gets the RFC Reference number for filing an RFR
+     * under Request for Change option
+     *
+     * @param $request_code - (required) the specific type of request
+     *                        (ex: Req-001, Req-002, etc)
+     * @return Response
+     */
+     public function getRFCRef( $request_code, $project_no)
+     {  
+        return $this->where(['req_code' => $request_code, 'project_no' => $project_no])
+                    ->get(['rfc_code', 'rfc_name', 'lot_no']);
+     } 
+
+    /**
+     * Saves a new request
+     *
+     * @param $data - (required) Form data
+     * @param $user_id - (required) id of user
+     * @return Response
+     */
+    public function saveRequest($data, $user_id)
+    {   
+        $EASRequestApprover = new EASRequestApprover;
+        $latest_request_code = $this->where('rfc_code', 'LIKE', $data['filing_type'].'%')->orderBy('rfc_DOR', 'desc')->orderBy('rfc_code','desc')->first(['rfc_code']);
+        $latest_request_code = explode('-', $latest_request_code->rfc_code);
+
+        //Get request code depending on the request type except for RFCs
+        //Assign the corresponding request_code depending on what is filed
+        if( $data['filing_type'] == 'QAC')
+        {
+            $this->rfc_code = 'QAC-' . (string)((int)trim($latest_request_code['1']) + 1);
+            $this->req_code ='Req-021';
+            $this->rfc_scheme = $data['payment_scheme'];
+            $this->rfc_contamt = (float)str_replace(',','',$data['contract_amount']);
+            $remarks = $data['remarks'];
+
+        }
+        else if( $data['filing_type'] == 'RFR')
+        {
+            $this->rfc_code = 'RFR-' . (string)((int)trim($latest_request_code['1']) + 1);
+            $this->req_code ='Req-014';
+            $this->re_reasons = $data['reasons'];
+            $remarks = $data['remarks'];
+
+            if( $data['nature_reopening']['0'] == 'Code-001')
+            {
+                $this->re_nature = 'Forfeiture';
+                $this->re_first = date('m/d/Y', strtotime($data['first_reminder']));
+                $this->re_second = date('m/d/Y', strtotime($data['second_reminder']));
+                $this->re_notice = date('m/d/Y', strtotime($data['notice_of_forfeiture']));
+                $this->re_amort = $data['number_of_amortization_paid'];
+                $this->re_nature = 'Forfeiture';
+            }
+            else if( $data['nature_reopening']['0'] == 'Code-002')
+            {
+                $nature_and_req_code  = explode(':', $data['rfc_ref_no']);
+                $this->rfc_refno = $nature_and_req_code[0]; 
+                $this->re_nature = 'RFC - ' . $nature_and_req_code[1];
+            }
+        }
+        else if( $data['filing_type'] == 'RFC')
+        {
+            $this->rfc_code = 'RFC-' . (string)((int)trim($latest_request_code['1']) + 1);
+            $request_code  = explode('+', $data['req_ref']);
+            $this->req_code = $request_code['0'];
+            $this->rfc_from = $data['from'];
+            $this->rfc_to = $data['to'];
+            $this->rfc_scheme = $data['payment_scheme'];
+            $this->rfc_note = $data['req_note'];
+            $remarks = $this->rfc_note;
+        }
+
+        $this->rfc_DOR =  date('Y-m-d h:i:s', strtotime($data['date_filed']));
+        $this->project_no = $data['project_type'];
+        $this->lot_no = $data['lot_code'];
+        $this->rfc_model = $data['model_type'];
+        $this->rfc_landarea = $data['lot_area']; /*to check*/
+        $this->rfc_floorarea = $data['floor_area'];
+        $this->rfc_name = $data['owners_name']; /*to check*/
+        $this->app_code = $user_id;
+        $this->rfc_stat= 'Pending';
+        $this->sales_date = date('Y-m-d', strtotime($data['date_reserved']));
+
+        //Save request
+        $this->save();
+
+        //Save approver
+        if( $data['filing_type'] == 'RFC')
+        {
+            $EASRequestApprover->saveRequestApprovers($this->req_code, $this->rfc_code, $data['approvers'], 
+                                                    $data['close_codes'], $remarks, $data['attachment_type'],
+                                                    $data['other_attachment']);
+        }
+        else
+        {
+            $EASRequestApprover->saveRequestApprovers($this->req_code, $this->rfc_code, $data['approvers'], 
+                                                    $data['close_codes'], $remarks);
+        }
+
+        return $this->rfc_code;
+    }
+
+        /*  this->business_id = $data['req_note'];
+        $this->app_code = $data['req_note'];
+        $this->rfc_stat = $data['req_note'];
+        $this->sales_date = $data['req_note'];
+
+        $this->nature = $data['req_note'];
+        $this->duedate = $data['req_note'];
+        $this->aprvdate = $data['req_note'];
+        $this->refno = $data['req_note'];
+        $this->contamt = $data['req_note'];
+        $this->unittype = $data['req_note'];
+        $this->turnover = $data['req_note'];
+        $this->amount = $data['req_note'];
+        $this->bank_code = $data['req_note'];
+        $this->rfc_noa = $data['req_note'];
+        $this->con_code = $data['req_note'];
+        $this->aprvdate = $data['req_note'];
+        $this->rfc_alertdate = $data['req_note'];
+
+        $this->first = $data['req_note'];
+        $this->second = $data['req_note'];
+        $this->notice = $data['req_note'];
+        $this->amort = $data['req_note'];*/
+
+    /**
+     * Saves a new request
+     *
+     * @param $user_id - (required) id of user
+     * @return Response
+     */
+    public function getUnsignedFiledRequest($user_id)
+    {
+        $paginationLenght = 10;
+
+        $filed_request = $this->where(['rfc.app_code' => $user_id, 
+                                       'rfc.rfc_stat' => 'Pending',
+                                       'rfc_line.rfcline_level' => '2', 
+                                       'rfc_line.rfcline_stat' => 'Pending'])
+                              ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code');
+
+        return $filed_request;
     }
 }

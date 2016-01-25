@@ -4,9 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-//additonal includes
-
-
 class RequestTypeApprover extends Model
 {
     protected $table = 'request_line';
@@ -14,42 +11,28 @@ class RequestTypeApprover extends Model
     public $timestamps = false;
 
     /**
-     * Retrieves the default approver of a ceratin request and project
+     * Retrieves the default approver of a certain request and project
      *
-     * @param $request_code - (required) Request Code. Values: 'QAC', 'RFC', 'RFR'
      * @param $project_code - (required) Project Code.
      * @param $house_code - House Code
+     * @param $request_type_code - required when filing request is of type 'RFR' and QAC
+     * @param $user_id - (required)
      * @return Response
      */
-    public function getRequestApprover( $filing_type = '', $project_code = '', $house_code = '')
-    {	
-    	//Get request code depending on the request type
-
-    	//Assign the corresponding request_code depending on what is filed
-        if( $filing_type == 'QAC')
-        {
-            $request_code = 'Req-021';
-        }
-        else if( $filing_type == 'RFR')
-        {
-            $request_code = 'Req-014';
-        }
+    public function getRequestApprover($project_code = '', $house_code = '', $request_type_code, $user_id)
+    {
         //Retrieve default approvers
         //Main query
         $query = $this->join('approver', 'approver.app_code', '=', 'request_line.app_code')
     				  ->join('closing', 'closing.close_code', '=', 'request_line.close_code')
     				  ->where('request_line.project_no', '=', $project_code)
-    				  ->where('request_line.app_level', '!=', '1');
-
-    	//Check if request type is RFC, if so, exclude QAC and RFR (and all other non-rfc request) in the query
-    	if( $filing_type == 'RFC')
-    	{
-    		$query->whereNotIn('request_line.req_code', ['Req-021', 'Req-014']);
-    	}
-    	else
-    	{
-    		$query->whereIn('request_line.req_code', [$request_code]);
-    	}
+    				  ->where('request_line.app_level', '!=', '1')
+                      ->where('request_line.req_code', $request_type_code)
+                      ->orWhere(function($query) use ($user_id, $project_code){
+                            $query->where('request_line.app_code', '=', $user_id)
+                                  ->where('request_line.app_level', '=', '1')
+                                  ->where('request_line.project_no', '=', $project_code);
+                      });
 
     	//Check if house code provided, if so include in query
     	if(strlen($house_code) > 0)
@@ -60,9 +43,26 @@ class RequestTypeApprover extends Model
     	//Retrieve query result
     	$request_approvers = $query->orderBy('request_line.app_level')
     							   ->get(['approver.app_code', 'approver.app_lname', 'approver.app_fname', 
-    									  'request_line.app_level', 'request_line.mandatory',
-    									  'closing.close_desc']);
-
+    									  'approver.app_position', 'request_line.app_level', 'request_line.mandatory',
+    									  'closing.close_desc', 'closing.close_code']);
+                                   
     	return $request_approvers;
+    }
+
+    /**
+     * Retrieves the request types that the user is granted rights with
+     *
+     * @param $user_id - (required)
+     * @return Response
+     */
+    public function getUserGrantedRequestTypes($user_id)
+    {
+        $query = $this->where('app_code', '=', $user_id)
+                     ->where('app_level', '=', '1')
+                     ->join('request', 'request.req_code', '=', 'request_line.req_code')
+                     ->distinct('req_code','project_no')
+                     ->get(['request_line.req_code', 'request.req_desc', 'request_line.project_no', 'request_line.close_code']);
+
+        return $query;
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\RequestTypeApprover;
 use Response;
+use Auth;
 
 class RequestTypeApproverController extends Controller
 {
@@ -94,13 +95,25 @@ class RequestTypeApproverController extends Controller
     public function getRequestApprover(Request $request)
     {
         //Initialization
-        $filing_type = $request['filing_type'];
-        $project_code = $request['project_type'];
         $RequestTypeApprover = new RequestTypeApprover;
-
+        $filing_type = $request->filing_type;
+        $project_code = $request->project_code;
+        $request_type_code = '';
+        $user_id = trim(Auth::user()->app_code);
+        
+        //Get request type code (DB:req_code)
+        if($filing_type == 'RFC')
+        {
+            $request_type_code = $request->req_ref;
+        }
+        else if ($filing_type == 'RFR' || $filing_type == 'QAC')
+        {
+            $request_type_code = $request->request_type_code;
+        }
+        
         //Retrieve default approvers
-        $request_approvers = $RequestTypeApprover->getRequestApprover($filing_type, $project_code);
-
+        $request_approvers = $RequestTypeApprover->getRequestApprover($project_code, '', $request_type_code, $user_id);
+ 
         return Response::json($request_approvers);
     }
 }

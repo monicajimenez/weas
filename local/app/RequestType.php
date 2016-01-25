@@ -11,9 +11,9 @@ class RequestType extends Model
     public $timestamps = false;
 
     /**
-     * Get all request type depending on the rights of the user.
-     * @param $request_type - (required) The type of request.
-     						  Values: 'QAC', 'RFC', 'RFR'
+     * Get all request types belonging to a certain category
+     * @param $request_type - (required) The type of request you want to query.
+     * 						  Values: 'QAC', 'RFC', 'RFR'
      * @return Response
      */
     public function getRequestType($request_type = '')
@@ -27,8 +27,8 @@ class RequestType extends Model
     		$request_type_desc = ['Qualified Accounts for Construction'];
     	}
     	else if($request_type == 'RFR')
-    	{
-    		$request_type_desc = ['Request for Reopening']; 	
+    	{ 
+    		$request_type_desc = ['Forfeiture/Discontinue the purchase']; 	
     	}
 
     	//Get request type's values
@@ -38,8 +38,8 @@ class RequestType extends Model
     	}
     	else if( $request_type == 'RFC' )
     	{
-    		$request_type_values = $this->whereNotIn('req_desc', ['Qualified Accounts for Construction', 'Request for Reopening'])
-    									->get(['req_code']);
+    		$request_type_values = $this->whereNotIn('req_desc', ['Qualified Accounts for Construction', 'Request for Reopening', 'Forfeiture/Discontinue the purchase'])
+    									->get(['req_code', 'req_desc']);
     	}
 
     	return $request_type_values;

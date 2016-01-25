@@ -53,4 +53,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
                             
         return $department;
     }
+
+    public function getApprover()
+    {
+        $approvers = $this->get(['app_code', 'app_fname', 'app_lname', 'app_position']);
+
+        return $approvers;
+    }
 }

@@ -193,3 +193,47 @@ footer.page-footer .footer-copyright{
     }
 }
 /*End: Width*/
+
+/*Form Inputs and Labels Edits*/
+.select-wrapper input.select-dropdown{
+	line-height: 0em;
+	height: 1.364rem;
+}
+
+label[for="project_type"], #container_req_ref label
+{
+	top: -1.0rem;
+}
+
+#btn_modal_rfc_request_reference
+{
+	width: 59px;
+    padding: 1px;
+    float: right;
+    top: -16px;
+}
+
+label[for="rfc_ref_no"]
+{
+	top: -1.4rem;
+}
+
+label[for="rfc_ref_no"].active
+{
+	transform: translateY(-30%); 
+}
+
+input[name=rfc_ref_no]{
+	height: 1.2rem;
+    width: 70%;
+}
+
+#btn_modal_rfc_request_reference .btn i
+{
+	    font-size: 0.9rem;
+}
+
+textarea{
+	border: none;
+}
+/*End: Form Inputs and Labels Edits*/

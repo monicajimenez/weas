@@ -1,10 +1,12 @@
 @extends("layouts/master")
-@section('sitetitle', 'Request Details')
-@section('pagetitle', 'Request Details')
+@section('sitetitle', 'Edit Request')
+@section('pagetitle', 'Edit Request')
 @section("content")
 <div class="row">
   <div class="col s11 m10 right">
-    <form action="{{ route('request.update', ['request_id' => trim($details->rfc_code)]) }}" method="get">     
+    <form action="{{ route('request.update')}}" method="post">     
+    <input type="hidden" name="_token" value="{{ csrf_token()}}"/>
+    <input name="request_code" type="hidden" value="{{ $details->rfc_code }}">
       <!-- View Errors -->
       @if($errors->any())
         @foreach($errors->all() as $error)
@@ -19,8 +21,8 @@
           <h5>Basic Details:</h5>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="qac_code" type="text" class="validate" value="{{ $details->rfc_code }}">
-              <label for="qac_code">Request Code</label>
+              <input disabled name="request_code" type="text" class="validate" value="{{ $details->rfc_code }}">
+              <label for="request_code">Request Code</label>
             </div>
           </div>
           <div class="row">
@@ -37,13 +39,13 @@
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="owners_name" type="text" class="validate" value="{{ $details->rfc_name }}">
+              <input name="owners_name" type="text" class="validate" value="{{ $details->rfc_name }}">
               <label for="owners_name">Owner's Name</label>
             </div>
           </div>
           <!-- Additional Includes for RFC Type of Requests -->
           @if( str_contains(trim($details->rfc_code),'RFC') || str_contains(trim($details->rfc_code),'RFR'))
-            @include("request.details_additional_basic_rfc")
+            @include("request.edit_additional_basic_rfc")
           @endif
           <!-- End: Additional Includes for RFC Type of Requests -->
         </div>
@@ -53,89 +55,98 @@
           <h5>Project Details:</h5>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="project" type="text" class="validate" value="{{ $details->project_no }}">
+              <select id="project_type" name="project_type">
+                <option value="{{$details->project_no}}" disabled>Choose your option</option>
+                @foreach($projects as $project)
+                  @if($project->project_no != $project->project_no)
+                    <option value="{{$project->project_no}}">{{$project->project_no}} - {{$project->project_desc}}</option>
+                  @else
+                    <option value="{{$project->project_no}}" selected>{{$project->project_no}} - {{$project->project_desc}}</option>
+                  @endif
+                @endforeach
+              </select>
               <label for="project">Project</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="cotract_amount" type="text" class="validate" value="@if(trim($details->rfc_contamt)){{number_format(trim($details->rfc_contamt)) }}@endif">
+              <input name="cotract_amount" type="text" class="validate" value="@if(trim($details->rfc_contamt)){{number_format(trim($details->rfc_contamt)) }}@endif">
               <label for="cotract_amount">Contract Amount</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="lot_code" type="text" class="validate" value="{{ $details->lot_no }}">
+              <input name="lot_code" type="text" class="validate" value="{{ $details->lot_no }}">
               <label for="lot_code">Lot Code</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="lot_area" type="text" class="validate" value="{{ $details->rfc_landarea}}">
+              <input name="lot_area" type="text" class="validate" value="{{ $details->rfc_landarea}}">
               <label for="lot_area">Lot Area</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="floor_area" type="text" class="validate" value="{{ $details->rfc_floorarea }}">
+              <input name="floor_area" type="text" class="validate" value="{{ $details->rfc_floorarea }}">
               <label for="floor_area">Floor Area</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="house_model" type="text" class="validate" value="{{ $details->rfc_model }}">
+              <input name="house_model" type="text" class="validate" value="{{ $details->rfc_model }}">
               <label for="house_model">House Model</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="payment_scheme" type="text" class="validate" value="{{ $details->rfc_scheme }}">
+              <input name="payment_scheme" type="text" class="validate" value="{{ $details->rfc_scheme }}">
               <label for="payment_scheme">Payment Scheme</label>
             </div>
           </div>
         </div>
 
         <div class="col s10 m5 hide-on-med-and-up">
-          <h5>Project Details:</h5>
+          <h5>Project Details:</h5> <!--drop down of project listing -->
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="project" type="text" class="validate" value="{{ $details->project_no }}">
+              <input name="project" type="text" class="validate" value="{{ $details->project_no }}">
               <label for="project">Project</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="cotract_amount" type="text" class="validate" value="@if(trim($details->rfc_contamt)){{number_format(trim($details->rfc_contamt)) }}@endif">
+              <input name="cotract_amount" type="text" class="validate" value="@if(trim($details->rfc_contamt)){{number_format(trim($details->rfc_contamt)) }}@endif">
               <label for="cotract_amount">Contract Amount</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="lot_code" type="text" class="validate" value="{{ $details->lot_no }}">
+              <input name="lot_code" type="text" class="validate" value="{{ $details->lot_no }}">
               <label for="lot_code">Lot Code</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="lot_area" type="text" class="validate" value="{{ $details->rfc_landarea}}">
+              <input name="lot_area" type="text" class="validate" value="{{ $details->rfc_landarea}}">
               <label for="lot_area">Lot Area</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="floor_area" type="text" class="validate" value="{{ $details->rfc_floorarea }}">
+              <input name="floor_area" type="text" class="validate" value="{{ $details->rfc_floorarea }}">
               <label for="floor_area">Floor Area</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="house_model" type="text" class="validate" value="{{ $details->rfc_model }}">
+              <input name="house_model" type="text" class="validate" value="{{ $details->rfc_model }}">
               <label for="house_model">House Model</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="payment_scheme" type="text" class="validate" value="{{ $details->rfc_scheme }}">
+              <input name="payment_scheme" type="text" class="validate" value="{{ $details->rfc_scheme }}">
               <label for="payment_scheme">Payment Scheme</label>
             </div>
           </div>
@@ -152,7 +163,7 @@
       </div>
       <!-- Loan and NOA Details -->
       @if( str_contains(trim($details->rfc_code),'QAC') )
-        @include("request.details_loan_noa")
+        @include("request.edit_loan_noa")
       @endif
       <!-- End: Loan and NOA Details -->
       <!-- Table of Approvers -->
@@ -205,32 +216,18 @@
         </div>
       </div>
       <!-- Remarks -->
-      @if( !str_contains(trim($details->rfc_code),'RFR') && 
-          (isset($signed) && isset($authorize_to_sign) && $signed == '0' && $authorize_to_sign == 1))
-        @if(trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-hold')
-          @include("request.includes_remarks")
-        @endif
+      @if((trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-hold') && !str_contains(trim($details->rfc_code),'RFR'))
+        @include("request.remarks")
       @endif
       <!-- End: Remarks -->   
       <!-- Buttons-->
-      <div class="fixed-action-btn click-to-toggle" style="bottom: 80px;">
+      <div class="fixed-action-btn" style="bottom: 80px;">
         <a class="btn-floating btn-large">
         <i class="large material-icons">mode_edit</i>
         </a>
         <ul>
-          <li><a class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></a></li>
-          <!-- @if(str_contains(trim($details->rfc_code),'RFC'))
-            <li><a class="btn-floating btn-small waves-effect purple modal-trigger" href="#modal_admin_fee"><i class="material-icons">perm_identity</i></a></li>
-          @endif -->
-          @if(isset($signed) && isset($authorize_to_sign) && $signed == '0' && $authorize_to_sign == 1)
-            @if( trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-Hold')
-              <li><button type="submit" name="approver_response" value="Denied" title="Deny" class="btn-floating btn-small waves-effect waves-light red"><i class="material-icons">thumb_down</i></button></li>
-              <li><button type="submit" name="approver_response" value="Signed" title="Approve" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">thumb_up</i></button></li>
-            @endif
-            @if(trim($details->rfc_stat) == "Pending")
-              <li><button type="submit" name="approver_response" value="On-Hold" title="Put On-Hold" class="btn-floating btn-small waves-effect waves-light yellow"><i class="material-icons">pause_circle_outline</i></button></li>
-            @endif
-          @endif
+          <li><button type="submit" name="approver_response" value="Edit" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">done</i></button></li>
+          <li><a class="btn-floating btn-small waves-effect waves-light modal-trigger" href="#modal_attachments"><i class="material-icons">description</i></a></li>
         </ul>
       </div>
       <!-- End: Buttons-->

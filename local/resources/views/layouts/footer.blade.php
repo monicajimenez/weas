@@ -3,7 +3,7 @@
 		<div class=""></div>
 		<div class="footer-copyright" he>
 	        <div class="right-align">
-		        &copy; 2015, All rights reserved.
+		        &copy; <?php echo date("Y");?>, All rights reserved.
 	        </div>
 	     </div>
 	</div>

@@ -47,12 +47,16 @@ Route::group(['as' => 'user.'], function () {
                'as' => 'logout',
                'uses' => 'UserController@logout'
             ]);
+    Route::post('approver', [
+               'as' => 'approver', 
+               'uses' => 'UserController@getApprover'
+            ]);
 });
 /*End: User*/
 
 /*Requests*/
 Route::resource('request', 'RequestController', [
-    'except' => ['update'],
+    'except' => ['update', 'edit'],
     'middleware' => 'auth.user'
 ]);
 Route::get('request/view/{request_status}', 
@@ -61,7 +65,7 @@ Route::get('request/view/{request_status}',
     'middleware' => 'auth.user',  
     'uses' => 'RequestController@index'
 ]);
-Route::get('request/update/{request_id})', 
+Route::post('request/update', 
 [
     'as' => 'request.update',
     'middleware' => 'auth.user', 
@@ -72,6 +76,15 @@ Route::get('request/create/{request_type})',
     'as' => 'request.create',
     'middleware' => 'auth.user', 
     'uses' => 'RequestController@create'
+]);
+Route::get('request/edit/{request_id}/{filing_type})', 
+[
+    'as' => 'request.edit',
+    'middleware' => 'auth.user', 
+    'uses' => 'RequestController@edit'
+]);
+Route::post('request/get/rfc_references', [
+    'as' => 'getRFCRequestReferences', 'uses' => 'RequestController@getRFCRequestRefence'
 ]);
 /*End: Requests*/
 
