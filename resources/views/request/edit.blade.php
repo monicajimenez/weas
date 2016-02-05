@@ -263,9 +263,27 @@
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function(){    
-    
+  $(document).ready(function(){        
     $('label').addClass('active');
+
+    //Function getting new token
+    function getToken()
+    {
+      $.ajax({
+          type: 'GET',
+          url: '{{route("token")}}',
+          async: false,
+          context: this,
+          data: "",
+          timeout: this.url_check_timeout,
+          success: function (token) {
+              $('meta[name="csrf-token"]').attr('content', token );
+          }.bind(this),
+          error: function () {
+              this.lastError = NetError.invalidURL;
+          }.bind(this)
+      });
+    }
 
     //Function for populating the Approvers' table
     function populateApproversTable(data)
@@ -300,8 +318,9 @@
     //QAC and RFR (Forfeiture)  Filing: Handler for Project Name Dropdown and populating the Approvers' table thereafter
     //RFC Filing: Handler for Project Name Dropdown and populating the RFC REF dropdown thereafter
     $('#project_type').change(function(){
+      getToken();
       filing_type = $('input[name="filing_type"]').val();
-      console.log('hello');
+      
       if( filing_type == 'RFR' || filing_type == 'QAC')
       {
         request_type_code = '';
@@ -318,7 +337,8 @@
         $.ajax({
           url: '{{route("getrequesttypeapprovers")}}',
           type: 'POST',
-          data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(), 'request_type_code': request_type_code, '_token': $('meta[name="csrf-token"]').attr('content') },
+          data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(), 
+                 'request_type_code': request_type_code, '_token': $('meta[name="csrf-token"]').attr('content') },
           success: function(data){
             console.log('to enter populate Approvers Table');
               populateApproversTable(data);
@@ -329,6 +349,7 @@
 
     //RFR (Request for Change) Filing: Handler for RFC Request Reference Dropdown and Populating of RFCs Table thereafter
     $('#rfc_request_reference').change(function(){
+      getToken();
       var data = $('#rfc_request_reference').val().split('.');
       var request_code = data[0];
       var project_no = data[1];
@@ -358,8 +379,8 @@
   
     //RFR Filing: Handler for adding of the RFC Code in the form upon user click in the RFC Refs Table and Populating the Approvers' Table
     $('#table_rfc_request_reference').on('click', '.add_rfc_request_referece', function() {
+      getToken();
       data = $(this).attr('id').split('.');
-      console.log(data);
       request_type_code = data[0];
       project_code = data[2];
       request_type_code = data[1];
@@ -370,7 +391,8 @@
       $.ajax({
         url: '{{route("getrequesttypeapprovers")}}',
         type: 'POST',
-        data: {'project_code' : project_code, 'filing_type': filing_type, 'request_type_code': request_type_code ,'_token': $('meta[name="csrf-token"]').attr('content') },
+        data: {'project_code' : project_code, 'filing_type': filing_type, 'request_type_code': request_type_code ,
+               '_token': $('meta[name="csrf-token"]').attr('content') },
         success: function(data){
              populateApproversTable(data);
         }
@@ -385,7 +407,7 @@
     /*RFC Filing: Handler of the Request Type Drop Down under Additional Details
     Requires that a Project Name be chosen in the Basic Details Area*/
     $('#req_ref').change(function(){
-      console.log('in here');
+      getToken();
       var data = $('#req_ref').val().split('+');
       $.ajax({
         url: '{{route("getrequesttypeapprovers")}}',

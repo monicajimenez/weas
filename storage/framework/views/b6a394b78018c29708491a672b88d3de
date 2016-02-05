@@ -1,0 +1,363 @@
+<?php $__env->startSection('sitetitle', 'Dashboard'); ?>
+<?php $__env->startSection('pagetitle', 'Dashboard'); ?>
+<?php $__env->startSection("content"); ?>
+<div class="row">
+	<div class="col s12 m12">
+		<!-- Requests Statistics -->
+		<div class="row">
+			<div class="col s12 m10 right">
+				<div id="card-stats">
+				    <div class="row">
+						<!-- View Errors -->
+					    <?php if($errors->any()): ?>
+					    	<?php foreach($errors->all() as $error): ?>
+					          <p class="errors"><?php echo e($error); ?></p>
+					        <?php endforeach; ?>
+					    <?php endif; ?>
+				    	<!-- End: View Errors -->
+					    <?php foreach($statistics as $data): ?>
+				        	<div class="col s12 m6 l3">
+					        	<div class="card">
+					                <div class="card-content
+					                	<?php
+				                	 		if( trim($data->rfc_stat) == 'Pending') echo 'blue';
+						                    elseif( trim($data->rfc_stat) == 'Denied') echo 'red';
+						                    elseif( trim($data->rfc_stat) == 'On-Hold') echo 'yellow';
+						                    elseif( trim($data->rfc_stat) == 'Approved') echo 'green';
+						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'grey';
+						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'purple';
+					                    ?>
+					                white-text">
+					                    <p class="card-stats-title"><i class="material-icons left">
+					                    <?php if( trim($data->rfc_stat) == 'Pending'): ?>thumbs_up_down
+					                    <?php elseif( trim($data->rfc_stat) == 'Denied'): ?>thumb_down
+					                    <?php elseif( trim($data->rfc_stat) == 'On-Hold'): ?>pause_circle_outline
+					                    <?php elseif( trim($data->rfc_stat) == 'Approved'): ?>thumb_up
+					                    <?php elseif( trim($data->rfc_stat) == 'Cancelled'): ?>not_interested
+					                    <?php elseif( trim($data->rfc_stat) == 'Reset'): ?>restore
+					                    <?php endif; ?>
+					                    </i><?php echo e(trim($data->rfc_stat)); ?> Requests</p>
+					                    <h4 class="card-stats-number center-align"><?php echo e(trim($data->total)); ?></h4>
+					                    <!-- <p class="card-stats-compare"><i class="mdi-hardware-keyboard-arrow-up"></i> 15% <span class="green-text text-lighten-5">from yesterday</span> 
+					                    </p>-->
+					                </div>
+					                <div class="card-action
+					                	<?php
+				                	 		if( trim($data->rfc_stat) == 'Pending') echo 'blue';
+						                    elseif( trim($data->rfc_stat) == 'Denied') echo 'red';
+						                    elseif( trim($data->rfc_stat) == 'On-Hold') echo 'yellow';
+						                    elseif( trim($data->rfc_stat) == 'Approved') echo 'green';
+						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'grey';
+						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'purple';
+					                    ?>
+					                darken-2">
+					                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
+					                </div>
+					            </div>
+				        	</div>
+				        <?php endforeach; ?>
+				    </div>
+				</div>
+			</div>
+		</div>
+		<!-- End: Requests Statistics -->
+
+		<!-- Requests Table Container -->
+		<!-- Request Table Label -->
+		<div class="row">
+			<div class="col s11 m10 right">
+				<h5 class="left-align">Unsigned Requests
+					<?php if($statistics_unsigned->total > 0): ?>
+						<em class="red-text">(<?php echo e($statistics_unsigned->total); ?>)</em>
+					<?php endif; ?>
+				</h5>
+			</div>
+		</div>
+		<!-- End: Request Table Label -->
+
+    	<!-- Search Field -->
+	    <?php if($statistics_unsigned->total > 0): ?>
+	    <div class="row">
+	      <div class="col s12 m3 right">	
+	        <form action="<?php route('dashboard') ?>" method="get">
+	          <div class="input-field">
+	            <input type="search" id="search-field" class="field" required maxlength="" name="search">
+	            <label for="search-field"><i class="mdi-action-search"></i></label>
+	            <i class="mdi-navigation-close close"></i>
+	          </div>
+	        </form>
+	      </div>
+	    </div>
+	    <?php endif; ?>
+	    <!-- End: Search Field -->
+
+		<!-- TABS -->
+		<div class="row">
+		    <div class="col s12 m10 right">
+		      <ul class="tabs">
+		        <li class="tab col s3"><a class="active" href="#unsignedPendingRequestTab">Unsigned Pending Requests</a></li>
+		        <li class="tab col s3"><a href="#unsignedOnHoldRequestTab">Unsigned On-Hold Requests</a></li>
+		      </ul>
+		    </div>
+		    <!-- Unsigned Pending Request Tab -->
+		    <div id="unsignedPendingRequestTab" class="row">
+
+		    	<!-- Request Table -->
+				 <?php if($pending_requests->count()>0): ?>
+					<div class="row">
+						<div class="col s12 m10 right">
+							<table class="responsive-table hoverable">
+								<thead class="">
+									<tr>
+										<th data-field="code" class="center-align">
+											 Code
+										</th>
+										<th data-field="owners_name" class="center-align">
+											 Owner's Name
+										</th>
+										<th data-field="project_name" class="center-align">
+											 Project Name
+										</th>
+										<th data-field="lot_code" class="center-align">
+											 Lot Code
+										</th>
+										<th data-field="payment_scheme" class="center-align">
+											 Payment Scheme
+										</th>
+										<th data-field="qualification_date" class="center-align">
+											 Qualification Date
+										</th>
+										<th data-field="date_filed" class="center-align">
+											 Date Filed
+										</th>
+										<th data-field="actions" class="center-align">
+											 Actions
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+					              <?php foreach($pending_requests as $pending_request): ?>
+					                <tr>
+					                  <td><?php echo e(trim($pending_request->rfc_code)); ?></td>
+					                  <td><?php echo e(trim($pending_request->rfc_name)); ?></td>
+					                  <td><?php echo e(trim($pending_request->project_no)); ?></td>
+					                  <td><?php echo e(trim($pending_request->lot_no)); ?></td>
+					                  <td><?php echo e(trim($pending_request->rfc_scheme)); ?></td>
+					                  <td>
+					                  	<?php if($pending_request->rfc_alertdate): ?>
+					                      <?php echo e(date('m/d/Y', strtotime(trim($pending_request->rfc_alertdate)))); ?>
+
+					                    <?php endif; ?>
+					                  </td>
+					                  <td>
+					                  	<?php if($pending_request->rfc_DOR): ?>
+					                      <?php echo e(date('m/d/Y', strtotime(trim($pending_request->rfc_DOR)))); ?>
+
+					                    <?php endif; ?>
+					                  </td>
+					                  <td>
+					                    <a href="<?php echo e(route('request.show', trim($pending_request->rfc_code) )); ?>">View</a>
+					                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
+					                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
+					                </tr>
+					              <?php endforeach; ?>
+					            </tbody>
+							</table>
+						</div>
+					</div>
+				<?php else: ?>
+		          	<div class="row">
+			          	<div class="col s12 m10 right">
+							<div class="center-align">All taken cared of.</div>
+						</div>
+					</div>
+		        <?php endif; ?>
+				<!-- End: Request Table -->
+
+				<!-- Pagination -->
+				<div class="col s12 m10 right">
+					<ul class="pagination right">
+						<?php echo $pending_requests->setPageName('pending_request_page'); ?>
+					</ul>
+				</div>
+				<!-- End: Pagination -->
+		    </div>
+		    <!-- End: Unsigned Pending Request Tab -->
+		    <!-- Unsigned On-Hold Request Tab -->
+		   	<div id="unsignedOnHoldRequestTab" class="row">
+		    	<!-- Request Table -->
+				 <?php if($onhold_requests->count()>0): ?>
+					<div class="row">
+						<div class="col s12 m10 right">
+							<table class="responsive-table hoverable">
+								<thead class="">
+									<tr>
+										<th data-field="code" class="center-align">
+											 Code
+										</th>
+										<th data-field="owners_name" class="center-align">
+											 Owner's Name
+										</th>
+										<th data-field="project_name" class="center-align">
+											 Project Name
+										</th>
+										<th data-field="lot_code" class="center-align">
+											 Lot Code
+										</th>
+										<th data-field="payment_scheme" class="center-align">
+											 Payment Scheme
+										</th>
+										<th data-field="qualification_date" class="center-align">
+											 Qualification Date
+										</th>
+										<th data-field="date_filed" class="center-align">
+											 Date Filed
+										</th>
+										<th data-field="actions" class="center-align">
+											 Actions
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+					              <?php foreach($onhold_requests as $onhold_request): ?>
+					                <tr>
+					                  <td><?php echo e(trim($onhold_request->rfc_code)); ?></td>
+					                  <td><?php echo e(trim($onhold_request->rfc_name)); ?></td>
+					                  <td><?php echo e(trim($onhold_request->project_no)); ?></td>
+					                  <td><?php echo e(trim($onhold_request->lot_no)); ?></td>
+					                  <td><?php echo e(trim($onhold_request->rfc_scheme)); ?></td>
+					                  <td>
+					                  	<?php if($onhold_request->rfc_alertdate): ?>
+					                      <?php echo e(date('m/d/Y', strtotime(trim($onhold_request->rfc_alertdate)))); ?>
+
+					                    <?php endif; ?>
+					                  </td>
+					                  <td>
+					                  	<?php if($onhold_request->rfc_DOR): ?>
+					                      <?php echo e(date('m/d/Y', strtotime(trim($onhold_request->rfc_DOR)))); ?>
+
+					                    <?php endif; ?>
+					                  </td>
+					                  <td>
+					                    <a href="<?php echo e(route('request.show', trim($onhold_request->rfc_code) )); ?>">View</a>
+					                    <!-- <a class="modal-trigger" href="#modal_remarks">Approve</a> -->
+					                  <!-- <a href="#">Approve</a><a href="#">Hold</a><a href="#">Deny</a> --></td>
+					                </tr>
+					              <?php endforeach; ?>
+					            </tbody>
+							</table>
+						</div>
+					</div>
+				<?php else: ?>
+		          	<div class="row">
+			          	<div class="col s12 m10 right">
+							<div class="center-align">All taken cared of.</div>
+						</div>
+					</div>
+		        <?php endif; ?>
+				<!-- End: Request Table -->
+
+				<!-- Pagination -->
+				<div class="col s12 m10 right">
+					<ul class="pagination right">
+						<?php echo $onhold_requests->setPageName('onhold_request_page'); ?>
+					</ul>
+				</div>
+				<!-- End: Pagination -->
+		    </div>
+		    <!-- End: Unsigned On-Hold Request Tab -->
+		 </div>
+		<!-- End: TABS -->
+		<!-- End: Requests Table Container-->
+
+		<!-- Requests Filed Request Container -->
+		<!-- Filed Request Table Label -->
+		<div class="row">
+			<div class="col s11 m10 right">
+				<h5 class="left-align">Filed Requests
+					<?php if(count($filed_requests) > 0): ?>
+						<em class="red-text">(<?php echo e(count($filed_requests)); ?>)</em>
+					<?php endif; ?>
+				</h5>
+			</div>
+		</div>
+		<!-- End: Filed Request Table Label -->
+
+		<div id="filed_request">
+			<!-- Request Table -->
+			 <?php if($filed_requests->count()>0): ?>
+				<div class="row">
+					<div class="col s12 m10 right">
+						<table class="responsive-table hoverable">
+							<thead class="">
+								<tr>
+									<th data-field="code" class="center-align">
+										 Code
+									</th>
+									<th data-field="project_name" class="center-align">
+										 Project Name
+									</th>
+									<th data-field="lot_code" class="center-align">
+										 Lot Code
+									</th>
+									<th data-field="payment_scheme" class="center-align">
+										 Payment Scheme
+									</th>
+									<th data-field="qualification_date" class="center-align">
+										 Qualification Date
+									</th>
+									<th data-field="date_filed" class="center-align">
+										 Date Filed
+									</th>
+									<th data-field="actions" class="center-align">
+										 Actions
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+				              <?php foreach($filed_requests as $filed_request): ?>
+				                <tr>
+				                  <td><?php echo e(trim($filed_request->rfc_code)); ?></td>
+				                  <td><?php echo e(trim($filed_request->project_no)); ?></td>
+				                  <td><?php echo e(trim($filed_request->lot_no)); ?></td>
+				                  <td><?php echo e(trim($filed_request->rfc_scheme)); ?></td>
+				                  <td>
+				                  	<?php if($filed_request->rfc_alertdate): ?>
+				                      <?php echo e(date('m/d/Y', strtotime(trim($filed_request->rfc_alertdate)))); ?>
+
+				                    <?php endif; ?>
+				                  </td>
+				                  <td>
+				                  	<?php if($filed_request->rfc_DOR): ?>
+				                      <?php echo e(date('m/d/Y', strtotime(trim($filed_request->rfc_DOR)))); ?>
+
+				                    <?php endif; ?>
+				                  </td>
+				                  <td>
+				                  <?php 
+				                  	$rfc_code = explode('-', trim($filed_request->rfc_code));
+				                  ?>
+				                    <a href="<?php echo e(route('request.show', trim($filed_request->rfc_code) )); ?>">View</a>
+				                    <a href="<?php echo e(route('request.edit', ['request_id' => trim($filed_request->rfc_code), 'filing_type' => $rfc_code['0']])); ?>">Edit</a>
+				                </tr>
+				              <?php endforeach; ?>
+				            </tbody>
+						</table>
+					</div>
+				</div>
+			<?php else: ?>
+	          	<div class="row">
+		          	<div class="col s12 m10 right">
+						<div class="center-align">All taken cared of.</div>
+					</div>
+				</div>
+	        <?php endif; ?>
+			<!-- End: Request Table -->
+		</div>
+		<!-- End Filed Request Table Container -->
+	</div>
+</div>
+<?php $__env->stopSection(); ?>
+
+
+<?php echo $__env->make("layouts/master", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

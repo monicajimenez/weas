@@ -101,10 +101,6 @@ class RequestController extends Controller
         {
             $data['granted_request_types'] = $RequestTypeApprover->getUserGrantedRequestTypes($user_id);
         }
-        else if($filing_type == 'RFC')
-        {
-            $data['req_refs'] =  $RequestType->getRequestType( 'RFC');
-        }
 
         return view('request.file', $data);
     }

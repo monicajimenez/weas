@@ -1,21 +1,20 @@
-@extends("layouts/master")
-@section('sitetitle', 'File '.$filing_type.' Request: ')
-@section('pagetitle', 'File '.$filing_type.' Request: ')
-@section("content")
+<?php $__env->startSection('sitetitle', 'File '.$filing_type.' Request: '); ?>
+<?php $__env->startSection('pagetitle', 'File '.$filing_type.' Request: '); ?>
+<?php $__env->startSection("content"); ?>
 <div class="row">
   <div class="col l10 right">
-    <form class="form-horizontal" id="form_file" method="post" action="{{ route('request.store') }}">
-    <input type="hidden" name="_token" value="{{ csrf_token()}}"/>
-    <input type="hidden"  name="filing_type" value="{{ $filing_type }}" />
+    <form class="form-horizontal" id="form_file" method="post" action="<?php echo e(route('request.store')); ?>">
+    <input type="hidden" name="_token" value="<?php echo e(csrf_token()); ?>"/>
+    <input type="hidden"  name="filing_type" value="<?php echo e($filing_type); ?>" />
 
-    @if($filing_type =='RFC' || $filing_type =='QAC')
-    @endif
+    <?php if($filing_type =='RFC' || $filing_type =='QAC'): ?>
+    <?php endif; ?>
       <!-- View Errors -->
-      @if($errors->any())
-        @foreach($errors->all() as $error)
-          <p class="errors">{{$error}}</p>
-        @endforeach
-      @endif
+      <?php if($errors->any()): ?>
+        <?php foreach($errors->all() as $error): ?>
+          <p class="errors"><?php echo e($error); ?></p>
+        <?php endforeach; ?>
+      <?php endif; ?>
       <!-- End: View Errors -->
 
       <!-- Basic Details ----> 
@@ -23,7 +22,7 @@
 
         <h5>Basic Details:</h5>
 
-        @if($filing_type =='RFR')
+        <?php if($filing_type =='RFR'): ?>
           <div class="row">
             <div class="input-field col l3">
                 <input class="with-gap" id="forfeiture" name="nature_reopening[]" value="Code-001" type="radio" checked/>
@@ -34,12 +33,12 @@
               <label for="request_for_change">Request for Change</label>
             </div>
           </div>
-        @endif
+        <?php endif; ?>
 
         <div class="row">
           <div class="input-field col l6">
-            <input name="date_filed" type="text" class="validate" value="{{date('M d, Y')}}" disabled>
-            <input name="date_filed" type="hidden" class="validate" value="{{date('M d, Y')}}">
+            <input name="date_filed" type="text" class="validate" value="<?php echo e(date('M d, Y')); ?>" disabled>
+            <input name="date_filed" type="hidden" class="validate" value="<?php echo e(date('M d, Y')); ?>">
             <label for="date_filed">Date Filled</label>
           </div>
           <div class="input-field col l6">
@@ -52,17 +51,17 @@
           <div class="input-field col l6" id="project_type_container_forfeiture">
             <select id="project_type" name="project_type">
               <option value="" disabled selected>Choose your option</option>
-              @foreach($projects as $project)
-                <option value="{{$project->project_no}}">{{$project->project_no}} - {{$project->project_desc}}</option>
-              @endforeach
+              <?php foreach($projects as $project): ?>
+                <option value="<?php echo e($project->project_no); ?>"><?php echo e($project->project_no); ?> - <?php echo e($project->project_desc); ?></option>
+              <?php endforeach; ?>
             </select>
             <label for="project_type">Project Name</label>
           </div>
           <div class="input-field col l3" id="project_type_container_rfr_rfc">
-            <input id="project_type" name="project_type" type="text" class="validate" @if($filing_type=='RFC') disabled @endif>
+            <input id="project_type" name="project_type" type="text" class="validate" <?php if($filing_type=='RFC'): ?> disabled <?php endif; ?>>
             <label for="project_type">Project Name</label>
           </div>
-          @if($filing_type == 'RFR')
+          <?php if($filing_type == 'RFR'): ?>
             <div class="input-field col l3" id="rfc_ref_no_container">
               <a class="waves-effect waves-light btn modal-trigger" id="btn_modal_rfc_request_reference" href="#modal_rfc_request_reference">
                 <i class="small material-icons">add</i>
@@ -70,7 +69,7 @@
               <input name="rfc_ref_no" type="text" class="validate" value="">
               <label for="rfc_ref_no">Reference Number (RFC)</label>
             </div>
-          @endif
+          <?php endif; ?>
           <div class="input-field col l6">
             <input name="lot_code" type="text" class="validate" value="">
             <label for="lot_code">Lot Code</label>
@@ -101,26 +100,26 @@
             <input name="owners_name" type="text" class="validate" value="">
             <label for="owners_name">Owner's Name</label>
           </div>
-          @if($filing_type == 'RFR')
+          <?php if($filing_type == 'RFR'): ?>
             <div class="input-field col l6">
               <input name="reasons" type="text" class="validate" value="">
               <label for="reasons">Reasons</label>
             </div>
-          @endif
-          @if($filing_type =='RFC' || $filing_type =='QAC')
+          <?php endif; ?>
+          <?php if($filing_type =='RFC' || $filing_type =='QAC'): ?>
             <div class="input-field col l6">
               <input name="payment_scheme" type="text" class="validate" value="">
               <label for="payment_scheme">Payment Scheme</label>
             </div>
-          @endif
+          <?php endif; ?>
         </div>
         <div class="row">
-          @if($filing_type =='QAC')
+          <?php if($filing_type =='QAC'): ?>
             <div class="input-field col l6">
               <input name="contract_amount" type="text" class="validate" value="">
               <label for="contract_amount">Contract Amount</label>
             </div>
-          @endif
+          <?php endif; ?>
         </div>
       </div>
       <!-- End: Basic Details ---->
@@ -133,9 +132,9 @@
       </div>
 
       <!-- Additional Details for RFC Type of Requests -->
-      @if($filing_type =='RFC')
-        @include("request.file_request_type")
-      @endif
+      <?php if($filing_type =='RFC'): ?>
+        <?php echo $__env->make("request.file_request_type", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+      <?php endif; ?>
       <!-- End: Additional Details for RFC Type of Requests -->
 
       <!-- Table of Approvers -->
@@ -181,21 +180,21 @@
       </div>
 
       <!-- Document Checklist -->
-      @if($filing_type =='RFC')
-        @include("request.includes_file_documents_check_list")
-      @endif
+      <?php if($filing_type =='RFC'): ?>
+        <?php echo $__env->make("request.includes_file_documents_check_list", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+      <?php endif; ?>
       <!-- End: Document Checklist -->
 
       <!-- RFR Forfeiture Reminder -->
-      @if($filing_type =='RFR')
-        @include("request.includes_file_reminder")
-      @endif
+      <?php if($filing_type =='RFR'): ?>
+        <?php echo $__env->make("request.includes_file_reminder", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+      <?php endif; ?>
       <!-- End: RFR Forfeiture Reminder -->
 
       <!-- Remarks -->
-      @if($filing_type !='RFC')
-        @include("request.includes_remarks")
-      @endif
+      <?php if($filing_type !='RFC'): ?>
+        <?php echo $__env->make("request.includes_remarks", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+      <?php endif; ?>
       <!-- End: Remarks --> 
 
       <!-- Buttons-->
@@ -212,9 +211,9 @@
     </form>
 
      <!-- Modal Includes -->
-      @if($filing_type =='RFR')
-        @include("request.modal_rfc_request_reference")
-      @endif
+      <?php if($filing_type =='RFR'): ?>
+        <?php echo $__env->make("request.modal_rfc_request_reference", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+      <?php endif; ?>
       <!-- End: Modal Includes -->
 
   </div>
@@ -232,7 +231,7 @@
     {
       $.ajax({
           type: 'GET',
-          url: '{{route("token")}}',
+          url: '<?php echo e(route("token")); ?>',
           async: false,
           context: this,
           data: "",
@@ -280,7 +279,7 @@
     //Handler for Add Approver Button below Approvers' Table
     /*$('#container_modal_add_approver').click(function(){
       $.ajax({
-        url: '{{route("user.approver")}}',
+        url: '<?php echo e(route("user.approver")); ?>',
         method: 'POST',
         data: {'_token': $('meta[name="csrf-token"]').attr('content')},
         success: function(data){
@@ -319,7 +318,7 @@
         }
 
         $.ajax({
-          url: '{{route("getrequesttypeapprovers")}}',
+          url: '<?php echo e(route("getrequesttypeapprovers")); ?>',
           method: 'POST',
           data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(), 
                  'request_type_code': request_type_code, '_token': $('meta[name="csrf-token"]').attr('content') },
@@ -331,7 +330,7 @@
       else if( filing_type == 'RFC')
       {
           $.ajax({
-            url: '{{route("getrequesttype")}}',
+            url: '<?php echo e(route("getrequesttype")); ?>',
             method: 'POST',
             data: {'request_type': $('input[name="filing_type"]').val(), 'project_type' :$('#project_type').val(), 
                   '_token': $('meta[name="csrf-token"]').attr('content') },
@@ -364,7 +363,7 @@
       var project_no = data[1];
       var request_description = data[2];
         $.ajax({
-          url: '{{route("getRFCRequestReferences")}}',
+          url: '<?php echo e(route("getRFCRequestReferences")); ?>',
           method: 'POST',
           data: {'request_code' : request_code, 'project_no': project_no, '_token': $('meta[name="csrf-token"]').attr('content') },
           success: function(data){
@@ -398,7 +397,7 @@
       filing_type = 'RFR';
 
       $.ajax({
-        url: '{{route("getrequesttypeapprovers")}}',
+        url: '<?php echo e(route("getrequesttypeapprovers")); ?>',
         method: 'POST',
         data: {'project_code' : project_code, 'filing_type': filing_type, 'request_type_code': request_type_code ,'_token': $('meta[name="csrf-token"]').attr('content') },
         success: function(data){
@@ -424,7 +423,7 @@
       getToken();
       var data = $('#req_ref').val().split('+');
       $.ajax({
-        url: '{{route("getrequesttypeapprovers")}}',
+        url: '<?php echo e(route("getrequesttypeapprovers")); ?>',
         method: 'POST',
         data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(),
                'req_ref': data[0], '_token': $('meta[name="csrf-token"]').attr('content') },
@@ -529,4 +528,5 @@
 
   });
 </script>
-@stop
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make("layouts/master", array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
