@@ -132,6 +132,17 @@ Route::post('RequestTypeApprover/getRequestApprover', [
 ]);
 /*End:Request Type Approver*/
 
+
+/*Request Type*/
+Route::post('/RequestType/getRequestType', [
+    'as' => 'getrequesttype', 'uses' => 'RequestTypeController@getRequestType'
+]);
+/*End:Request Type Approver*/
+
+Route::get('token', [ 'as' => 'token', function () {
+   return csrf_token();
+}]);
+
 /*TEST Routes*/
 Route::get('userdetails', function(){
    dd(Auth::user());
