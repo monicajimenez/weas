@@ -245,6 +245,7 @@
         <i class="large material-icons">mode_edit</i>
         </a>
         <ul>
+          <li><a class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></a></li>
           <li><button type="submit" name="approver_response" value="Edit" title="Update" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">done</i></button></li>
         </ul>
       </div>
@@ -252,6 +253,7 @@
     </form>
 
      <!-- Modal Includes -->
+      @include("request.modal_attachment")
       @include("request.modal_add_approver")
 
       @if($filing_type =='RFR')

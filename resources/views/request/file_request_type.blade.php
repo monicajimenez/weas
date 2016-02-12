@@ -2,8 +2,8 @@
     <h5>Additonal Details:</h5>
 	<div class="row">
 		<div class="input-field col l6" id="container_req_ref">
-		    <select id="req_ref" name="req_ref">
-		       	<option value="" disabled selected>Choose your option</option>
+		    <select id="req_ref" name="req_ref" class="form-control">
+		       	<option value="Choose your option">Choose your option</option>
 		    </select>
 	    	<label>Request Type</label>
 	    </div>
