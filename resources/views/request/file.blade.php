@@ -342,18 +342,40 @@
               pointerReqRef.empty();
               liPointer.empty();
 
+              liPointer.append('<li class="disabled active"><span>Choose your option</span></li>');
+              pointerReqRef.append('<option value="disabled selected">Choose your option</option>');
+            
               $.each( data, function( key, rfc_ref ) {
-                newliContent = "<li class=''><span>" + rfc_ref['req_desc'] + "</span></li>";
-                newOptionContent = "<option value='" + rfc_ref['req_code'] + "+" + rfc_ref['req_desc'] + "'>" +
-                                     rfc_ref['req_desc'] + 
-                                "</option>";
-                                
-                liPointer.append(newliContent);
-                pointerReqRef.append(newOptionContent);
+                console.log(rfc_ref['req_desc'] + "\n");
+                liPointer.append($("<li></li>").html($("<span></span>").attr("value",rfc_ref['req_desc'])
+                                                                       .attr("class", $.trim(rfc_ref['req_code']))
+                                                                       .text(rfc_ref['req_desc'])));
+                pointerReqRef.append($("<option></option>").attr("value", rfc_ref['req_code'] + "+" + rfc_ref['req_desc'])
+                                                           .attr("id", $.trim(rfc_ref['req_code']))
+                                                           .text(rfc_ref['req_desc']));
               });
             }
           });           
       }
+    });
+
+    //RFC Filing: Handler of the Request Type Drop Down under Additional Details
+    //Requires that a Project Name be chosen in the Basic Details Area
+    $('#container_req_ref ul').on('click', 'li', function(){
+      $('#container_req_ref input').val($(this).text());
+      pointerSpan = $(this).find("span");
+      $('#container_req_ref #req_ref').find('#'+ pointerSpan.attr('class')).prop("selected","selected");
+      getToken();
+      var data = $('#req_ref').val().split('+');
+      $.ajax({
+        url: '{{route("getrequesttypeapprovers")}}',
+        method: 'POST',
+        data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(),
+               'req_ref': data[0], '_token': $('meta[name="csrf-token"]').attr('content') },
+        success: function(data){
+            populateApproversTable(data);
+        }
+      });   
     });
 
     //RFR (Request for Change) Filing: Handler for RFC Request Reference Dropdown and Populating of RFCs Table thereafter
@@ -416,22 +438,6 @@
       $('label[for=lot_code]').addClass('active');
       $('#project_type_container_rfr_rfc label[for=project_type]').addClass('active');
       $('#btn_modal_rfc_request_reference').hide();
-    });
-
-    //RFC Filing: Handler of the Request Type Drop Down under Additional Details
-    //Requires that a Project Name be chosen in the Basic Details Area
-    $('#req_ref').change(function(){
-      getToken();
-      var data = $('#req_ref').val().split('+');
-      $.ajax({
-        url: '{{route("getrequesttypeapprovers")}}',
-        method: 'POST',
-        data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(),
-               'req_ref': data[0], '_token': $('meta[name="csrf-token"]').attr('content') },
-        success: function(data){
-            populateApproversTable(data);
-        }
-      });              
     });
 
     //APPROVER TABLE SORTING FUNCTIONALITIES
