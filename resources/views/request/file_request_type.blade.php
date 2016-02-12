@@ -8,17 +8,17 @@
 	    	<label>Request Type</label>
 	    </div>
 	    <div class="input-field col l6">
-		    <input name="req_note" type="text" class="validate" value="">
+		    <input name="req_note" type="text" class="validate" value="{{Request::old('req_note')}}">
 		    <label for="req_note">Note</label>
 	    </div>
 	</div>
 	<div class="row">
 	  <div class="input-field col l6">
-	    <input name="from" type="text" class="validate" value="">
+	    <input name="from" type="text" class="validate" value="{{Request::old('from')}}">
 	    <label for="from">From</label>
 	  </div>
 	  <div class="input-field col l6">
-	    <input name="to" type="text" class="validate" value="">
+	    <input name="to" type="text" class="validate" value="{{Request::old('to')}}">
 	    <label for="to">To</label>
 	  </div>
 	</div>

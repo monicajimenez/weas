@@ -67,49 +67,49 @@
               <a class="waves-effect waves-light btn modal-trigger" id="btn_modal_rfc_request_reference" href="#modal_rfc_request_reference">
                 <i class="small material-icons">add</i>
               </a>
-              <input name="rfc_ref_no" type="text" class="validate" value="">
+              <input name="rfc_ref_no" type="text" class="validate" value="{{Request::old('rfc_ref_no')}}">
               <label for="rfc_ref_no">Reference Number (RFC)</label>
             </div>
           @endif
           <div class="input-field col l6">
-            <input name="lot_code" type="text" class="validate" value="">
+            <input name="lot_code" type="text" class="validate" value="{{Request::old('lot_code')}}">
             <label for="lot_code">Lot Code</label>
           </div>
         </div>
         <div class="row">
           <div class="input-field col l6">
-            <input name="date_reserved" type="date" class="datepicker validate" value="">
+            <input name="date_reserved" type="date" class="datepicker validate" value="{{Request::old('date_reserved')}}">
             <label for="date_reserved">Date Reserved</label>
           </div> 
           <div class="input-field col l6">
-            <input name="model_type" type="text" class="validate" value="">
+            <input name="model_type" type="text" class="validate" value="{{Request::old('model_type')}}">
             <label for="model_type">Model Type</label>
           </div>
         </div>
         <div class="row">
           <div class="input-field col l6">
-            <input name="lot_area" type="text" class="validate" value="">
+            <input name="lot_area" type="text" class="validate" value="{{Request::old('lot_area')}}">
             <label for="lot_area">Lot Area (sqm)</label>
           </div>
           <div class="input-field col l6">
-            <input name="floor_area" type="text" class="validate" value="">
+            <input name="floor_area" type="text" class="validate" value="{{Request::old('floor_area')}}">
             <label for="floor_area">Floor Area</label>
           </div>
         </div>
         <div class="row">
           <div class="input-field col l6">
-            <input name="owners_name" type="text" class="validate" value="">
+            <input name="owners_name" type="text" class="validate" value="{{Request::old('owners_name')}}">
             <label for="owners_name">Owner's Name</label>
           </div>
           @if($filing_type == 'RFR')
             <div class="input-field col l6">
-              <input name="reasons" type="text" class="validate" value="">
+              <input name="reasons" type="text" class="validate" value="{{Request::old('reasons')}}">
               <label for="reasons">Reasons</label>
             </div>
           @endif
           @if($filing_type =='RFC' || $filing_type =='QAC')
             <div class="input-field col l6">
-              <input name="payment_scheme" type="text" class="validate" value="">
+              <input name="payment_scheme" type="text" class="validate" value="{{Request::old('payment_scheme')}}">
               <label for="payment_scheme">Payment Scheme</label>
             </div>
           @endif
@@ -117,7 +117,7 @@
         <div class="row">
           @if($filing_type =='QAC')
             <div class="input-field col l6">
-              <input name="contract_amount" type="text" class="validate" value="">
+              <input name="contract_amount" type="text" class="validate" value="{{Request::old('contract_amount')}}">
               <label for="contract_amount">Contract Amount</label>
             </div>
           @endif
