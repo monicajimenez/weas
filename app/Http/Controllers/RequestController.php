@@ -200,7 +200,7 @@ class RequestController extends Controller
         //Redirect back if with errors
         if ($validator->fails()) 
         {
-            return Redirect::back()->withErrors($validator)->withInput();
+            return Redirect::back()->withInput($request->all())->withErrors($validator);
         }
 
         //Save request
