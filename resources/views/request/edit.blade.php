@@ -241,12 +241,12 @@
 
       <!-- Buttons-->
       <div class="fixed-action-btn click-to-toggle" style="bottom: 80px;">
-        <a class="btn-floating btn-large">
-        <i class="large material-icons">mode_edit</i>
+        <a class="btn-floating btn-large red">
+          <i class="large material-icons">mode_edit</i>
         </a>
         <ul>
-          <li><a class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></a></li>
-          <li><button type="submit" name="approver_response" value="Edit" title="Update" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">done</i></button></li>
+          <li><a><button type="button" class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></button></a></li>
+          <li><a><button type="submit" name="approver_response" value="Edit" title="Update" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">done</i></button></a></li>
         </ul>
       </div>
       <!-- End: Buttons-->

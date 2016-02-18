@@ -220,7 +220,7 @@
         <i class="large material-icons">mode_edit</i>
         </a>
         <ul>
-          <li><a class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></a></li>
+          <li><a><button class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></button></a></li>
           <!-- @if(str_contains(trim($details->rfc_code),'RFC'))
             <li><a class="btn-floating btn-small waves-effect purple modal-trigger" href="#modal_admin_fee"><i class="material-icons">perm_identity</i></a></li>
           @endif -->
