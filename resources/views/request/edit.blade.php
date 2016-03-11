@@ -46,7 +46,7 @@
         <div class="row">
           <div class="input-field col l6">
             <input disabled name="date_filed" type="text" class="validate" value="{{$details->rfc_DOR}}">
-            <label for="date_filed">Date Filled</label>
+            <label for="date_filed">Date Filed</label>
           </div>
           <div class="input-field col l6">
             <input disabled name="request_type_code" type="text" class="validate" value="{{$details->rfc_code}}">
@@ -128,6 +128,7 @@
             <input name="owners_name" type="text" class="validate" value="{{$details->rfc_name}}">
             <label for="owners_name">Owner's Name</label>
           </div>
+          MONICA{{$filing_type}}
           @if($filing_type == 'RFR')
             <div class="input-field col l6">
               <input name="reasons" type="text" class="validate" value="{{$details->re_reasons}}">

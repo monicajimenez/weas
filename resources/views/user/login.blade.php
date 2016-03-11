@@ -11,7 +11,8 @@
 			        <p class="errors">{{$error}}</p>
 			      @endforeach
 			    @endif
-				<form action="{{ route('user.login') }}" enctype="multipart/form-data" method="post">
+				<form action="{{ route('user.login') }}" method="post">
+    				<input type="hidden" name="_token" value="{{ csrf_token()}}"/>
 					<div class="card medium">
 					    <div class="card-image">
 					      <img class="circle responsive-img" src="{{ asset('images/login.jpg') }}">

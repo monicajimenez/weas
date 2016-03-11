@@ -44,20 +44,45 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->app_password;
     }
 
+    /**
+     * Returns the department of user
+     * @param $user_id - (required)
+     *
+     * @return department
+     */
     public function getDepartment($user_id)
     {
-        $department = $this->select('department.dept_name')
-                            ->where(['approver.app_code' => $user_id])
-                            ->join('department', 'department.dept_code', '=', 'approver.dept_code')
-                            ->first();
+        $department = $this->where(['approver.app_code' => $user_id])
+                           ->join('department', 'department.dept_code', '=', 'approver.dept_code')
+                           ->first(['department.dept_name','department.dept_code','department.dept_initial']);
                             
         return $department;
     }
 
+    /**
+     * Returns list of approvers
+     *
+     * @return approvers
+     */
     public function getApprover()
     {
         $approvers = $this->get(['app_code', 'app_fname', 'app_lname', 'app_position']);
-
+ 
         return $approvers;
+    }
+
+    /**
+     * Returns all team members of the department the user belongs
+     * @param $user_id = (required)
+     *
+     * @return approvers
+     */
+    public function getCoTeamMembers($user_id = '')
+    {
+        $department = $this -> getDepartment($user_id);
+        $co_team_members = $this->where(['dept_code' => $department->dept_code])
+                         ->get(['app_code', 'app_fname', 'app_lname', 'app_position']);
+
+        return $co_team_members;
     }
 }

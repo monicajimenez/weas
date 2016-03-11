@@ -71,7 +71,7 @@ Route::post('request/update/',
     'middleware' => 'auth.user', 
     'uses' => 'RequestController@update'
 ]);
-Route::get('request/create/{request_type})', 
+Route::get('request/create/{request_type}', 
 [
     'as' => 'request.create',
     'middleware' => 'auth.user', 
@@ -139,9 +139,15 @@ Route::post('/RequestType/getRequestType', [
 ]);
 /*End:Request Type Approver*/
 
+/*Token*/
 Route::get('token', [ 'as' => 'token', function () {
    return csrf_token();
 }]);
+/*End:Token*/
+
+/*Unit*/
+Route::resource('unit', 'UnitController');
+/*End:Unit*/
 
 /*TEST Routes*/
 Route::get('userdetails', function(){

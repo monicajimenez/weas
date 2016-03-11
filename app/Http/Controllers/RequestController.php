@@ -14,6 +14,8 @@ use App\RequestTypeApprover;
 use App\EASRequest;
 use App\Email;
 use App\RequestType;
+use App\User;
+use App\Unit;
 use Validator;
 use Input;
 use Auth;
@@ -84,22 +86,38 @@ class RequestController extends Controller
      * @return Response
      */
     public function create($filing_type = '')
-    {
+    {        
         //Initialization
         $projects = new Project;    
         $EASRequest = new EASRequest;
         $RequestType = new RequestType;
         $RequestTypeApprover = new RequestTypeApprover;
+        $Unit = new Unit;
+        $User = new User;
         $data['filing_type'] = $filing_type;
         $user_id = trim(Auth::user()->app_code);
 
         //Retrieve user granted projects
         $data['projects'] = $projects->getProjects($user_id, $filing_type, '3');
 
+
         //Additional variables per request type, if any.
         if($filing_type == 'RFR')
         {
             $data['granted_request_types'] = $RequestTypeApprover->getUserGrantedRequestTypes($user_id);
+        }
+        else if($filing_type == 'PR')
+        {   
+            $data['item_units'] = $Unit->getUnit();
+            $data['requesting_department'] = $User->getDepartment($user_id);
+            $data['pr_no'] = $data['requesting_department']['dept_initial'] . '-' . date('Y') . '-' ;
+            $data['team_members'] = $User->getCoTeamMembers($user_id);
+        }
+
+        //Return View
+        if($filing_type == 'PR')
+        {
+            return view('request.purchase.file', $data);
         }
 
         return view('request.file', $data);

@@ -32,6 +32,10 @@ class RequestType extends Model
     	{ 
     		$request_type_code = ['Req-014']; 	
     	}
+        else if($request_type == 'PR')
+        { 
+            $request_type_code = ['Req-040','Req-041','Req-042'];   
+        }
 
         //Where Clause
         if($project_type != 'all')
@@ -40,7 +44,7 @@ class RequestType extends Model
         }
 
     	//Get request type's values
-    	if($request_type == 'QAC' || $request_type == 'RFR')
+    	if($request_type == 'QAC' || $request_type == 'RFR' || $request_type == 'PR')
     	{
     		$sub_query = $this->where(['request.req_code' => $request_type_code]);
     	}

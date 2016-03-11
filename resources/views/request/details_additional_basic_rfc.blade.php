@@ -1,13 +1,13 @@
 <div class="row">
 	<div class="input-field col s12">
 	  <input disabled name="request_type" type="text" class="validate" value="{{ $details->req_desc }}">
-	  <label for="owners_name">Request Type</label>
+	  <label for="request_type">Request Type</label>
 	</div>
 </div>
 <div class="row">
 	<div class="input-field col s12">
 	  <input disabled name="from" type="text" class="validate" value="{{ $details->rfc_from }}">
-	  <label for="owners_name">From</label>
+	  <label for="from">From</label>
 	</div>
 </div>
 <div class="row">

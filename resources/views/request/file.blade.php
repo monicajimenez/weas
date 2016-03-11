@@ -8,8 +8,6 @@
     <input type="hidden" name="_token" value="{{ csrf_token()}}"/>
     <input type="hidden"  name="filing_type" value="{{ $filing_type }}" />
 
-    @if($filing_type =='RFC' || $filing_type =='QAC')
-    @endif
       <!-- View Errors -->
       @if($errors->any())
         @foreach($errors->all() as $error)
@@ -346,7 +344,6 @@
               pointerReqRef.append('<option value="disabled selected">Choose your option</option>');
             
               $.each( data, function( key, rfc_ref ) {
-                console.log(rfc_ref['req_desc'] + "\n");
                 liPointer.append($("<li></li>").html($("<span></span>").attr("value",rfc_ref['req_desc'])
                                                                        .attr("class", $.trim(rfc_ref['req_code']))
                                                                        .text(rfc_ref['req_desc'])));
@@ -462,7 +459,6 @@
         helper: fixHelperModified,
         stop: updateIndex
     }).disableSelection();
-    
 
     // DYNAMICALLY ADDED COMPONENTS' EVENT LISTENERS
     $('#table_approvers').on('click', '.delete_app', function() {
@@ -522,6 +518,7 @@
     //RFR Onclick Events
     $('#request_for_change').click(function(){  
       requiredRFRRFCFields();
+
       $('#project_type_container_rfr_rfc input[name=project_type]').prop('disabled', true);
       $('input[name=lot_code]').prop('disabled', true);
       toogleEvents();
