@@ -31,7 +31,7 @@
 			                  </div>
 			                </div>
 					    </div>
-					    <div class="card-action section">
+					    <div class="card-action">
 					    	<button type="submit" class="waves-effect waves-light btn">Log In</button>
 					    	<input type="hidden" name="_token" value="{{{ csrf_token() }}}"></input>
 					    </div>
