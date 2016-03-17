@@ -5,10 +5,17 @@
         @include("layouts.head")
     </head>
     <body>
-      <header>
+      @if(
+        strpos(Request::path(),'/') === 0 ||
+        strpos(Request::path(),'login') === 0 ||
+        strpos(Request::path(),'logout') === 0
+      )
+      @else
+        <header>
           @include("layouts.nav")
-      </header>
-      <main>
+        </header>
+      @endif
+      <main class="valign-wrapper">
         <div class="container">
           @yield("content")
         </div>

@@ -45,6 +45,11 @@ margin-bottom: 0px;
   font-size:12px;
   font-weight: 900;
 }
+
+.card .card-action {
+    border-top: none;
+    padding: 5px;
+}
 /*End: Card*/
 
 /*Page Title*/
