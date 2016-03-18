@@ -10,7 +10,7 @@
 	strpos(Request::path(),'request/edit/') !== false ||
 	strpos(Request::path(),'request/update/') !== false )
 	<script type="text/javascript" src="{{ asset('js/jquery-ui-1.11.4.js') }}"></script>
-	<meta name="csrf-token" content="{!! csrf_token() !!}">
+	<meta name="csrf-token" content="{{csrf_token()}}">
 @endif
 
 <!-- Add required CSS files for Materialize to function -->

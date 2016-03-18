@@ -48,7 +48,7 @@
             <label for="file">File</label>
         </p>
 
-        <input type="file" name="upload_attachment" value="Upload attachment"></input>
+        <input type="file" name="upload_attachment" accept="application/pdf" value="Upload attachment"></input>
         <input type="hidden" name="request_id" value="{{trim($details->rfc_code)}}"></input>
         <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Back</a>
         <button type="submit" id="upload_attachment" class=" modal-action modal-close waves-effect waves-green btn-flat">Upload Attachment</button>

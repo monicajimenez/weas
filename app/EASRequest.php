@@ -569,6 +569,21 @@ class EASRequest extends Model
                     ->get(['rfc_code', 'rfc_name', 'lot_no']);
      } 
 
+     /**
+     * Get new code for request
+     * @param $request_type - (required) Values: PR, QAC, RFC, RFR
+     *
+     * @return Response
+     */
+    public function getNewRequestCode($request_type)
+    {
+        $new_request_code = '';
+        $latest_request_code = $this->where('rfc_code', 'LIKE', $request_type.'%')->orderBy('rfc_DOR', 'desc')->orderBy('rfc_code','desc')->first(['rfc_code']);
+        $latest_request_code = explode('-', $latest_request_code->rfc_code);
+
+        return $request_type . '-' . (string)((int)trim($latest_request_code['1']) + 1);
+    }
+
     /**
      * Saves a new request
      *
@@ -579,14 +594,11 @@ class EASRequest extends Model
     public function saveRequest($data, $user_id)
     {  
         $EASRequestApprover = new EASRequestApprover;
-        $latest_request_code = $this->where('rfc_code', 'LIKE', $data['filing_type'].'%')->orderBy('rfc_DOR', 'desc')->orderBy('rfc_code','desc')->first(['rfc_code']);
-        $latest_request_code = explode('-', $latest_request_code->rfc_code);
 
         //Get request code depending on the request type except for RFCs
         //Assign the corresponding request_code depending on what is filed
         if( $data['filing_type'] == 'QAC')
         {
-            $this->rfc_code = 'QAC-' . (string)((int)trim($latest_request_code['1']) + 1);
             $this->req_code ='Req-021';
             $this->rfc_scheme = $data['payment_scheme'];
             $this->rfc_contamt = (float)str_replace(',','',$data['contract_amount']);
@@ -595,7 +607,6 @@ class EASRequest extends Model
         }
         else if( $data['filing_type'] == 'RFR')
         {
-            $this->rfc_code = 'RFR-' . (string)((int)trim($latest_request_code['1']) + 1);
             $this->req_code ='Req-014';
             $this->re_reasons = $data['reasons'];
             $remarks = $data['remarks'];
@@ -618,7 +629,6 @@ class EASRequest extends Model
         }
         else if( $data['filing_type'] == 'RFC')
         {
-            $this->rfc_code = 'RFC-' . (string)((int)trim($latest_request_code['1']) + 1);
             $request_code  = explode('+', $data['req_ref']);
             $this->req_code = $request_code['0'];
             $this->rfc_from = $data['from'];
@@ -628,6 +638,7 @@ class EASRequest extends Model
             $remarks = $this->rfc_note;
         }
 
+        $this->rfc_code = $this->getNewRequestCode($data['filing_type']);
         $this->rfc_DOR =  date('Y-m-d h:i:s', strtotime($data['date_filed']));
         $this->project_no = $data['project_type'];
         $this->lot_no = $data['lot_code'];

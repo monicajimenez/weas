@@ -34,8 +34,8 @@
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input disabled name="date_qualified" type="text" class="validate" value="@if($details->rfc_alertdate){{date('M d, Y', strtotime($details->rfc_alertdate))}}@endif">
-              <label for="date_qualified">Date Qualified</label>
+              <input disabled name="date_reserved" type="text" class="validate" value="@if($details->sales_date){{ date('M d, Y', strtotime($details->sales_date)) }}@endif">
+              <label for="date_reserved">Date Reserved</label>
             </div>
           </div>
           <div class="row">
@@ -44,8 +44,16 @@
               <label for="owners_name">Owner's Name</label>
             </div>
           </div>
+          @if($filing_type == 'RFR')
+          <div class="row">
+            <div class="input-field col s12">
+              <input disabled name="re_reasons" type="text" class="validate" value="{{ $details->re_reasons }}">
+              <label for="re_reasons">Reason</label>
+            </div>
+          </div>
+          @endif
           <!-- Additional Includes for RFC Type of Requests -->
-          @if( str_contains(trim($details->rfc_code),'RFC') || str_contains(trim($details->rfc_code),'RFR'))
+          @if( str_contains(trim($details->rfc_code),'RFC') )
             @include("request.details_additional_basic_rfc")
           @endif
           <!-- End: Additional Includes for RFC Type of Requests -->
@@ -90,12 +98,14 @@
               <label for="house_model">House Model</label>
             </div>
           </div>
+          @if($filing_type != 'RFR')
           <div class="row">
             <div class="input-field col s12">
               <input disabled name="payment_scheme" type="text" class="validate" value="{{ $details->rfc_scheme }}">
               <label for="payment_scheme">Payment Scheme</label>
             </div>
           </div>
+          @endif
         </div>
 
         <div class="col s10 m5 hide-on-med-and-up">
@@ -153,11 +163,19 @@
           </div>
         </div>
       </div>
-      <!-- Loan and NOA Details -->
+
+      <!-- QAC Loan and NOA Details -->
       @if( str_contains(trim($details->rfc_code),'QAC') )
         @include("request.details_loan_noa")
       @endif
-      <!-- End: Loan and NOA Details -->
+      <!-- End: QAC Loan and NOA Details -->
+
+      <!-- RFR Forfeiture Reminder -->
+      @if($filing_type =='RFR' && $details->re_nature == 'Forfeiture' )
+        @include("request.includes_file_reminder")
+      @endif
+      <!-- End: RFR Forfeiture Reminder -->
+
       <!-- Table of Approvers -->
       <div class="row">
         <div class="col s10">
