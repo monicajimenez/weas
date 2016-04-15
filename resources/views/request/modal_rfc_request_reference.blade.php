@@ -10,6 +10,21 @@
       <label>Project Name</label>
       <!-- Table of RFC Reference Numbers -->
       <div class="row">
+        <div class="col l10" id="preloader-wrapper-container">
+          <!-- Spinner -->
+          <div class="preloader-wrapper small active">
+            <div class="spinner-layer spinner-green-only">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+                <div class="circle"></div>
+              </div><div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+          </div>
+          <!-- End: Spinner -->
+        </div>
         <div class="col l10">
           <table class="responsive-table" id="table_rfc_request_reference">
           <thead class="">
@@ -28,7 +43,7 @@
             </th>
           </tr>
           </thead>
-          <tbody>
+          <tbody class="center-align">
           </tbody>
           </table>
         </div>

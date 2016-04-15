@@ -15,49 +15,30 @@ class RequestType extends Model
      * @param $request_type - (required) The type of request you want to query.
      * 						  Values: 'QAC', 'RFC', 'RFR'
      * @param $project_type - Values: Actual project_no or 'all'
+     * @param $user_id - (required)
      * @return Response
      */
-    public function getRequestType($request_type = '', $project_type='all')
+    public function getRequestType($request_type = '', $project_type='all', $user_id = '')
     {
-    	//Initialization
-    	$request_type_code = [];
-        $where_project = [] ;
-
-    	//Get request type's code
-    	if($request_type == 'QAC')
-    	{
-    		$request_type_code = ['Req-021'];
-    	}
-    	else if($request_type == 'RFR')
-    	{ 
-    		$request_type_code = ['Req-014']; 	
-    	}
-        else if($request_type == 'PR')
-        { 
-            $request_type_code = ['Req-040','Req-041','Req-042'];   
-        }
-
-        //Where Clause
-        if($project_type != 'all')
-        {
-            $where_project = ['request_line.project_no' => $project_type];
-        }
-
-    	//Get request type's values
     	if($request_type == 'QAC' || $request_type == 'RFR' || $request_type == 'PR')
     	{
-    		$sub_query = $this->where(['request.req_code' => $request_type_code]);
+    		$query = $this->where(['request.req_group' => $request_type]);
     	}
     	else if( $request_type == 'RFC' )
     	{
-    		$sub_query = $this->whereNotIn('request.req_desc', ['Qualified Accounts for Construction', 'Request for Reopening', 
-                                                     'Forfeiture/Discontinue the purchase']);
+    		$query = $this->whereNotIn('request.req_group', ['PR', 'QAC', 'RFR']);
     	}
 
-        $query = $sub_query->join('request_line', 'request_line.req_code', '=', 'request.req_code')
-                                     ->where($where_project)
-                                     ->distinct('req_code')                               
-                                     ->get(['request.req_code', 'request.req_desc']);
-    	return $query;
+        if($project_type != 'all')
+        {
+            $query->join('request_line', 'request_line.req_code', '=', 'request.req_code')
+                  ->distinct('req_code')
+                  ->where(['request_line.project_no' => $project_type, 'request_line.app_code' => $user_id]);
+        }
+
+        //Get query's result
+        $request_types = $query->get(['request.req_code', 'request.req_desc']);
+        
+    	return $request_types;
     }
 }

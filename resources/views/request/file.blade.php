@@ -38,7 +38,7 @@
           <div class="input-field col l6">
             <input name="date_filed" type="text" class="validate" value="{{date('M d, Y')}}" disabled>
             <input name="date_filed" type="hidden" class="validate" value="{{date('M d, Y')}}">
-            <label for="date_filed">Date Filled</label>
+            <label for="date_filed">Date Filed</label>
           </div>
           <div class="input-field col l6">
             <input name="request_type_code" type="text" class="validate" value="" disabled>

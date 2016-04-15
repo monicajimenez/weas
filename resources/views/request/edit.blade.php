@@ -128,7 +128,6 @@
             <input name="owners_name" type="text" class="validate" value="{{$details->rfc_name}}">
             <label for="owners_name">Owner's Name</label>
           </div>
-          MONICA{{$filing_type}}
           @if($filing_type == 'RFR')
             <div class="input-field col l6">
               <input name="reasons" type="text" class="validate" value="{{$details->re_reasons}}">

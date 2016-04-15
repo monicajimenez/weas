@@ -454,13 +454,13 @@ class EASRequest extends Model
         if( $data['filing_type'] == 'RFC')
         {
             $EASRequestApprover->saveRequestApprovers($user->req_code, $request_id, $data['approvers'], 
-                                                    $data['close_codes'], $remarks, $data['attachment_type'],
+                                                    $data['close_codes'], $remarks, $user_id, $data['attachment_type'],
                                                     $data['other_attachment']);
         }
         else
         {
             $EASRequestApprover->saveRequestApprovers($user->req_code, $request_id, $data['approvers'], 
-                                                    $data['close_codes'], $remarks);
+                                                    $data['close_codes'], $remarks, $user_id);
         }
     }
 
@@ -478,15 +478,13 @@ class EASRequest extends Model
     {
         //Retrieve all user assigned requests statistics in bulk
         if(!$request_status && $user_id)
-        {
-            //Retrive Request IDs
-            $request_ids = DB::table('rfc_line')->where('app_code', '=', $user_id)->lists('rfc_code');
-
+        {            
             //Get total number of requests per type
-            $statistics = $this->select(DB::raw('rfc_stat, count(*) as total'))
-                                    ->whereIn('rfc_code', $request_ids)
-                                    ->groupBy('rfc_stat')
-                                    ->get();
+            $statistics = $this->select(DB::raw('rfc.rfc_stat, count(*) as total'))
+                               ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
+                               ->where('rfc_line.app_code', $user_id)
+                               ->groupBy('rfc.rfc_stat')
+                               ->get();
         }
         //Retrieve total number of a specific request type
         else
@@ -657,13 +655,13 @@ class EASRequest extends Model
         if( $data['filing_type'] == 'RFC')
         {
             $EASRequestApprover->saveRequestApprovers($this->req_code, $this->rfc_code, $data['approvers'], 
-                                                    $data['close_codes'], $remarks, $data['attachment_type'],
+                                                    $data['close_codes'], $remarks, $user_id, $data['attachment_type'],
                                                     $data['other_attachment']);
         }
         else
         {
             $EASRequestApprover->saveRequestApprovers($this->req_code, $this->rfc_code, $data['approvers'], 
-                                                    $data['close_codes'], $remarks);
+                                                    $data['close_codes'], $remarks, $user_id);
         }
 
         return $this->rfc_code;

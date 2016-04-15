@@ -106,7 +106,7 @@ class RequestTypeApproverController extends Controller
         {
             $request_type_code = $request->req_ref;
         }
-        else if ($filing_type == 'RFR' || $filing_type == 'QAC')
+        else if ($filing_type == 'RFR' || $filing_type == 'QAC' || $filing_type == 'PR')
         {
             $request_type_code = $request->request_type_code;
         }
