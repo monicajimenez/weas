@@ -32,13 +32,15 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-        if( Auth::check())
+        $User = new User;
+
+        if(Auth::check())
         {
             return Redirect::route('dashboard');
         }
         else if(($request->input('username') && $request->input('password')))
         {
-            if(Auth::attempt(['app_email' => $request->input('username'),'password'  => $request->input('password')]))
+            if(Auth::attempt(['app_email' => $request->input('username'),'password'  => $request->input('password'), 'app_active' => '1']))
             {
                 Auth::login(Auth::user(), true);
                 //Auth::user()->setAttribute('deparmentsssssss', 'monica'); //$this->getDepartment()

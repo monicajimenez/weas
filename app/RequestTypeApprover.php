@@ -54,15 +54,22 @@ class RequestTypeApprover extends Model
      * Retrieves the request types that the user is granted rights with
      *
      * @param $user_id - (required)
+     * @param $filing_type - required if you would like to get only specific requests. Values: 'RFR','RFC','QAC','PR'
      * @return Response
      */
-    public function getUserGrantedRequestTypes($user_id)
+    public function getUserGrantedRequestTypes($user_id,$filing_type='')
     {
         $query = $this->where('app_code', '=', $user_id)
                      ->where('app_level', '=', '1')
                      ->join('request', 'request.req_code', '=', 'request_line.req_code')
-                     ->distinct('req_code','project_no')
-                     ->get(['request_line.req_code', 'request.req_desc', 'request_line.project_no', 'request_line.close_code']);
+                     ->distinct('req_code','project_no');
+
+        if($filing_type)
+        {
+            $query->where(['request_line.req_code'=>$filing_type]);
+        }
+         
+        $query->get(['request_line.req_code', 'request.req_desc', 'request_line.project_no', 'request_line.close_code']);
 
         return $query;
     }

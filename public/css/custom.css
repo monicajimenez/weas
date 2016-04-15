@@ -1,3 +1,4 @@
+
 /*
  * Custom Styles
  */
@@ -148,6 +149,16 @@ input[type=text]:disabled+label{
   padding: 5px;
 }
 
+#preloader-wrapper-container{
+  position: relative;
+  left: 50%;
+}
+
+.preloader-wrapper{
+  position:absolute;
+  display:none;
+}
+
  textarea.materialize-textarea:disabled+label, 
  textarea.materialize-textarea[readonly="readonly"]+label,
  textarea.materialize-textarea:disabled{
@@ -205,7 +216,9 @@ footer.page-footer .footer-copyright{
 	height: 1.364rem;
 }
 
-label[for="project_type"], #container_req_ref label
+label[for="project_type"], #container_req_ref label, 
+label[for="label_dd_pr_request_type"], label[for="label_dd_charge_to"],
+label[for="label_dd_charge_to_team"], label[for="label_dd_charge_to_project"]
 {
 	top: -1.0rem;
 }

@@ -30,10 +30,10 @@ class EmailController extends Controller
      */
     public function send( $request_details, $approver_response)
     {
-        $mail = new Email;
+        $Mail = new EMail;
         $user_id = trim(Auth::user()->app_code);
 
-        $recipients = $mail->sendMail($request_details, $approver_response, $user_id);
+        $recipients = $Mail->sendMail($request_details, $approver_response, $user_id);
 
         return true;
     }

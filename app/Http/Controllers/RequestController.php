@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 //additional includes
 use App\Http\Controllers\EmailController;
 use App\Project;
+use App\Department;
 use App\RequestTypeApprover;
 use App\EASRequest;
 use App\Email;
@@ -92,25 +93,32 @@ class RequestController extends Controller
         $EASRequest = new EASRequest;
         $RequestType = new RequestType;
         $RequestTypeApprover = new RequestTypeApprover;
-        $Unit = new Unit;
         $User = new User;
+        $Department = new Department;
         $data['filing_type'] = $filing_type;
         $user_id = trim(Auth::user()->app_code);
 
         //Retrieve user granted projects
-        $data['projects'] = $projects->getProjects($user_id, $filing_type, '3');
-
+        if($filing_type == 'PR')
+        {
+            $data['data_charge_to_projects'] = $projects->getProjects('', $filing_type, '3');    
+        }
+        else
+        {
+            $data['projects'] = $projects->getProjects($user_id, $filing_type, '3');
+        }
 
         //Additional variables per request type, if any.
         if($filing_type == 'RFR')
         {
-            $data['granted_request_types'] = $RequestTypeApprover->getUserGrantedRequestTypes($user_id);
+            $data['granted_request_types'] = $RequestTypeApprover->getUserGrantedRequestTypes($user_id,'RFR');
         }
         else if($filing_type == 'PR')
         {   
-            $data['item_units'] = $Unit->getUnit();
+            $data['data_pr_request_types'] = $RequestType->getRequestType($filing_type, 'all');
+            $data['data_charge_to_teams'] = $Department->getDepartments();
             $data['requesting_department'] = $User->getDepartment($user_id);
-            $data['pr_no'] = $data['requesting_department']['dept_initial'] . '-' . date('Y') . '-' ;
+            $data['pr_no'] = $data['requesting_department']['dept_initial'] . '-' . date('mmddY') . '-' ;
             $data['team_members'] = $User->getCoTeamMembers($user_id);
         }
 
@@ -251,6 +259,8 @@ class RequestController extends Controller
             $data['details'] = $EASRequest->getRequestDetails($request_id, $user_id);
             $data['signed'] = 0;
             $precedingLevel = $data['details']['user_approver']['rfcline_level']-1;
+            $data['approver_level'] = $data['details']['user_approver']['rfcline_level'];
+            $nextLevel = $data['details']['user_approver']['rfcline_level']+1;
             $data['authorize_to_sign'] = 0;
             $data['filing_type'] = substr($data['details']['rfc_code'], 0, 3);
 
@@ -264,6 +274,11 @@ class RequestController extends Controller
                 }
                 if( $approver->rfcline_level == $precedingLevel &&
                     (trim($approver->rfcline_stat) == 'Signed' || trim($approver->rfcline_stat) == 'Denied') )
+                {
+                    $data['authorize_to_sign'] = 1;
+                }
+                if($approver->rfcline_level == $nextLevel &&
+                    (trim($approver->rfcline_stat) == 'On-Hold') )
                 {
                     $data['authorize_to_sign'] = 1;
                 }
@@ -383,6 +398,7 @@ class RequestController extends Controller
             //Get updated details
             $data = [];
             $data['details'] = $EASRequest->getRequestDetails($request->request_code, $user_id);
+            $data['details']['approver_level'] = $request->approver_level;
 
             //Email Appropriate recipients
             $mail = new EmailController;

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 //additional includes
 use App\RequestType;
 use Response;
+use Auth;
 
 class RequestTypeController extends Controller
 {
@@ -98,8 +99,9 @@ class RequestTypeController extends Controller
     public function getRequestType(Request $request)
     {
         $RequesType = new RequestType;
+        $user_id = trim(Auth::user()->app_code);
 
-        return Response::json($RequesType->getRequestType($request->request_type, $request->project_type));
+        return Response::json($RequesType->getRequestType($request->request_type, $request->project_type,$user_id));
     }
 
     public function getRequestTypeTest($request_type = '', $project_type='')

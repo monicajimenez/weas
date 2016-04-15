@@ -85,4 +85,22 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
         return $co_team_members;
     }
+
+    /**
+     * Check if approver/user is active or not
+     * @param $user_id = (required)
+     *
+     * @return if active = true, else false
+     */
+    public function getStatus($user_id = '')
+    {
+        $isActive = $this->where(['app_code' => $user_id])
+                         ->get(['app_active']);
+        if($isActive == '1')
+        {
+            return true;
+        }
+        
+        return false;
+    }
 }

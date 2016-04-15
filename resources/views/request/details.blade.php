@@ -8,6 +8,8 @@
     <input type="hidden" name="_token" value="{{ csrf_token()}}"/>
     <input type="hidden"  name="filing_type" value="{{$filing_type}}" /> 
     <input name="request_code" type="hidden" value="{{ $details->rfc_code }}">
+    <input name="approver_level" type="hidden" value="{{ $approver_level }}">
+    
       <!-- View Errors -->
       @if($errors->any())
         @foreach($errors->all() as $error)

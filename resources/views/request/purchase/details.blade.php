@@ -1,6 +1,6 @@
 @extends("layouts/master")
-@section('sitetitle', 'File PR Request: ')
-@section('pagetitle', 'File PR Request: ')
+@section('sitetitle', 'Request Details: ')
+@section('pagetitle', 'Request Details: ')
 @section("content")
 <div class="row">
   <div class="col l10 right">
@@ -22,7 +22,7 @@
         <div class="col l10 section right">
           <div class="row">
             <div class="input-field col l2 right">
-              <input name="input_request_type_code" type="text" class="validate" value="" disabled>
+              <input name="input_request_type_code" type="text" class="validate" value="PR-001" disabled>
               <label for="label_request_type_code">Request Code</label>
             </div>
             <div class="input-field col l2 right">
@@ -36,16 +36,11 @@
         <div class="col l10 section left">
           <div class="row">
             <div class="input-field col l2 left">
-              <select id="id_dd_pr_request_type" name="name_dd_pr_request_type">
-                <option value="" disabled selected>Choose your option</option>
-                @foreach($data_pr_request_types as $data_pr_request_type)
-                  <option value="{{$data_pr_request_type->req_code}}">{{$data_pr_request_type->req_desc}}</option>
-                @endforeach
-              </select>
-              <label for="label_dd_pr_request_type">PR Request Type</label>
+              <input name="input_request_type" type="text" class="validate" value="Non-IT Related" disabled>
+              <label for="label_request_type">Request Type</label>
             </div>
             <div class="input-field col l2 left">              
-              <input name="input_amount" type="text" class="validate" value="">
+              <input name="input_amount" type="text" class="validate" value="100,000" disabled>
               <label for="label_amount">Amount</label>
             </div>
             <!-- Charge to: Commented out. Business might include. -->
@@ -220,9 +215,10 @@
         <i class="large material-icons">mode_edit</i>
         </a>
         <ul>
-          <li><a><button type="button" class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></button></a></li>
-          <li><button type="submit" value="Save" title="Save" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">done</i></button></li>
-          <li><button type="reset" value="Cancel" title="Cancel" class="btn-floating btn-small waves-effect waves-light red"><i class="material-icons">not_interested</i></button></li>
+          <li><a><button class="btn-floating btn-small waves-effect waves-light modal-trigger" title="Attachment" href="#modal_attachments"><i class="material-icons">attach_file</i></button></a></li>
+          <li><button type="submit" name="approver_response" value="Denied" title="Deny" class="btn-floating btn-small waves-effect waves-light red"><i class="material-icons">thumb_down</i></button></li>
+          <li><button type="submit" name="approver_response" value="Signed" title="Approve" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">thumb_up</i></button></li>
+          <li><button type="submit" name="approver_response" value="On-Hold" title="Put On-Hold" class="btn-floating btn-small waves-effect waves-light yellow"><i class="material-icons">pause_circle_outline</i></button></li>
         </ul>
       </div>
       <!-- End: Buttons-->
