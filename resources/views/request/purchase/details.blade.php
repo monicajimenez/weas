@@ -43,36 +43,6 @@
               <input name="input_amount" type="text" class="validate" value="100,000" disabled>
               <label for="label_amount">Amount</label>
             </div>
-            <!-- Charge to: Commented out. Business might include. -->
-            <!-- <div id="id_container_charge_to">
-              <div class="input-field col l2 left">
-                <select id="id_charge_to" name="name_dd_charge_to">
-                  <option value="" disabled selected>Choose your option</option>
-                  <option value="team">Team</option>
-                  <option value="project">Project</option>
-                </select>
-                <label for="label_dd_charge_to">Charge To</label>
-              </div>
-              <div id="id_charge_to_team" class="input-field col l2 left">
-                <select name="name_dd_charge_to_team">
-                  <option value="" disabled selected>Choose your option</option>
-                  @foreach($data_charge_to_teams as $data_charge_to_team)
-                    <option value="{{$data_charge_to_team->dept_code}}">{{$data_charge_to_team->dept_name}}</option>
-                  @endforeach
-                </select>
-                <label for="label_dd_charge_to_team">Team:</label>
-              </div>
-              <div id="id_charge_to_project" class="input-field col l2 left">
-                <select name="name_dd_charge_to_project">
-                  <option value="" disabled selected>Choose your option</option>
-                  @foreach($data_charge_to_projects as $data_charge_to_project)
-                    <option value="{{$data_charge_to_project->project_no}}">{{$data_charge_to_project->project_desc}}</option>
-                  @endforeach
-                </select>
-                <label for="label_dd_charge_to_project">Project:</label>
-              </div>
-            </div> -->
-            <!-- End: Charge to -->
           </div>
         </div>
 

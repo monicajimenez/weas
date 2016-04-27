@@ -16,6 +16,11 @@ class Email extends Model
     	//Get recipients
     	$recipients = $this->getRecipients( $request_details, $approver_response, $user_id);
 
+    	if(!$recipients)
+    	{
+    		return false;
+    	}
+
     	//Check if the request is approved by all
     	if($this->isFinalApprover($request_details->rfc_code, $user_id))
     	{
@@ -76,47 +81,33 @@ class Email extends Model
 
     //
     public function getRecipients( $request_details, $approver_response, $user_id)
-    {
-    	//For all other statuses except 'Signed'
-    	if( $approver_response != 'Signed')
-    	{
-    		
-    		foreach( $request_details->approvers as $approver)
-    		{
-    			$recipients[] =  $approver->app_code;
-    		}
+    {	
+		$recipients = DB::select( 
+									DB::raw("EXEC usp_get_email_recipients '"
+													.$user_id
+													."','".$request_details->rfc_code
+													."','".$request_details->approver_level
+													."','".$approver_response
+													."';") 
+								);
 
-    		$recipients = DB::table('approver')->whereIn('app_code', $recipients)->get(['app_email','app_fname', 'app_lname']);
-    	}
-    	//For Signed requests
-    	else if( $approver_response == 'Signed')
-    	{
-    		$recipients = DB::select( DB::raw("EXEC usp_get_email_recipients '".$user_id."','".$request_details->rfc_code."','".$request_details->approver_level."';") );
-    	}
+		if(isset($recipients[0]->flag_no_approver))
+		{
+			return null;
+		}
 
     	return $recipients;
     }
 
+    //
     public function isFinalApprover($rfc_code, $user_id)
     {
-    	$recipients = DB::select(
-                    (
-                        ";WITH APP(rfc_code, nextApprover, currentApprover, nextStatus)
-						AS
-						(
-						    SELECT l.rfc_code, LEAD(l.app_code) OVER(ORDER BY l.rfc_code, l.rfcline_level) nextApprover,
-							l.app_code AS currentApprover, LEAD(l.rfcline_stat) OVER(ORDER BY l.rfc_code, l.rfcline_level) nextStatus
-						    FROM
-						    rfc_line AS l
-						    WHERE l.rfc_code = '$rfc_code'
-						)
-
-						SELECT nextApprover
-						FROM APP
-						WHERE currentApprover = '$user_id'
-						AND nextStatus = 'Pending';"
-                    )
-                );
+    	$recipients = DB::select( 
+									DB::raw("EXEC usp_is_final_approver '"
+													.$user_id
+													."','".$rfc_code
+													."';") 
+								);
 
 		if(is_null($recipients) || !$recipients)
 		{	

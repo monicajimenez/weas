@@ -159,6 +159,8 @@ class RequestController extends Controller
                 'close_codes' => 'required',
                 'date_filed' => 'required',
                 'project_type' => 'required',
+                'req_note' => 'required',
+                'attachment_type' => 'required'
             ]);
         }
         else if($request->filing_type == 'QAC')
@@ -257,32 +259,11 @@ class RequestController extends Controller
             $user_id = trim(Auth::user()->app_code);
             $data = [];
             $data['details'] = $EASRequest->getRequestDetails($request_id, $user_id);
-            $data['signed'] = 0;
             $precedingLevel = $data['details']['user_approver']['rfcline_level']-1;
             $data['approver_level'] = $data['details']['user_approver']['rfcline_level'];
             $nextLevel = $data['details']['user_approver']['rfcline_level']+1;
-            $data['authorize_to_sign'] = 0;
+            $data['authorize_to_sign'] = $EASRequest->isAuthorizedToApprove($user_id, $request_id);
             $data['filing_type'] = substr($data['details']['rfc_code'], 0, 3);
-
-            foreach( $data['details']->approvers as $approver)
-            {   
-                if(trim($approver->app_code) == $user_id && 
-                    (trim($approver->rfcline_stat) == 'Signed' || trim($approver->rfcline_stat) == 'Denied') )
-                {
-
-                    $data['signed'] = 1;
-                }
-                if( $approver->rfcline_level == $precedingLevel &&
-                    (trim($approver->rfcline_stat) == 'Signed' || trim($approver->rfcline_stat) == 'Denied') )
-                {
-                    $data['authorize_to_sign'] = 1;
-                }
-                if($approver->rfcline_level == $nextLevel &&
-                    (trim($approver->rfcline_stat) == 'On-Hold') )
-                {
-                    $data['authorize_to_sign'] = 1;
-                }
-            }
 
             return view('request.details', $data);
         }
@@ -297,7 +278,8 @@ class RequestController extends Controller
      *
      * @param  int  $request_id (required)
      * @param $filing_type (required) values 'RFC', 'RFR' and 'QAC'
-     * @param $action_type values 'edit' -> for viewing an empty or filled form, 'update' -> for viewing newly saved request form
+     * @param $action_type values 'edit' -> for viewing an empty or filled form, 
+     *                            'update' -> for viewing newly saved request form
      * @return Response
      */
     public function edit($request_id, $filing_type, $action_type = 'edit')
@@ -368,7 +350,7 @@ class RequestController extends Controller
             $validator = Validator::make($request->all(), [
                         'approver_response' => 'required',
                         'notes' => 'required', 
-                        //In RFC, no remarks field is needed because the notes fields acts both as notes and remarks
+                        'remarks'=>'required'
                     ]);         
         }
         else if($request->filing_type == 'RFR' || $request->filing_type == 'QAC')
@@ -393,7 +375,7 @@ class RequestController extends Controller
         if($approver_response == 'Denied' || $approver_response == 'Signed' || $approver_response == 'On-Hold')
         {
             //Update the request
-            $EASRequest->respondRequest($request->request_code, $approver_response, $user_id, trim($request->remarks));
+            $EASRequest->respondRequest($request->request_code, $approver_response, $request->approver_level, trim($request->remarks));
 
             //Get updated details
             $data = [];
@@ -436,21 +418,31 @@ class RequestController extends Controller
         //
     }
 
+    /**
+     * For RFR Filing -> Request for Change 
+     * Retrieves values for populating table_rfc_request_reference
+     * @param Request $request
+     * @return Response
+     */
     public function getRFCRequestRefence(Request $request)
     {   
-        //Initialization
-        $request_code = $request['request_code'];
-        $project_no = $request['project_no'];
+        //Initialization;
         $EASRequest = new EASRequest;
 
-        return Response::json($EASRequest->getRFCRef($request_code, $project_no));
+        return Response::json(
+                                $EASRequest->getRFCRef  (   trim(Auth::user()->app_code), 
+                                                            $request['request_code'],
+                                                            $request['project_no']
+                                                        )
+                            );
     }
 
     public function testgetRFCRequestRefence($request_code, $project_no)
     {   
         //Initialization
         $EASRequest = new EASRequest;
+        $user_id = trim(Auth::user()->app_code);
 
-        return Response::json($EASRequest->getRFCRef($request_code, $project_no));
+        return Response::json($EASRequest->getRFCRef($user_id, $request_code, $project_no));
     }
 }

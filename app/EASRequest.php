@@ -175,46 +175,59 @@ class EASRequest extends Model
      * Retrieves a list of unsigned user requests
      *
      * @param $user_id - (required) id of user
-     * @param $status - (required) Values: 'Pending', 'On-Hold'
+     * @param $status - Required for the dashboard unsigned request table,
+     *                  Values: 'Pending', 'On-Hold'
+     * @param $search - Any string. Used in the dashboard search field.
+     *
      * @return Response
      */
-    public function getUnsignedRequest($user_id = '', $search = '', $status = '')
+    public function getUnsignedRequest($user_id = NULL, $search = NULL, $status = NULL)
     {
-        //Retrieve all request ids assigned to current user
+        /*$requests =     DB::select(     
+                                    DB::raw("EXEC usp_get_user_unsigned_requests '"
+                                                    .$user_id
+                                                    ."','".$request_code
+                                                    ."','".$project_no
+                                                    ."';") 
+                                );*/
+
         $requestIDs = DB::select(
                             (
-                                ";WITH LIST(list_rfc_code, list_previousStatus, list_app_code, list_level, list_stat)
-                                AS
-                                (
-                                    SELECT l.rfc_code, LAG(l.rfcline_stat) OVER(ORDER BY l.rfc_code, l.rfcline_level) previousStatus,
-                                    l.app_code, l.rfcline_level, l.rfcline_stat
-                                    FROM
-                                    rfc_line AS l
-                                    INNER JOIN rfc AS r
-                                    ON r.rfc_code = l.rfc_code
-                                    WHERE r.rfc_stat = 'pending'
-                                    AND l.rfc_code IN
+                                "   ;WITH LIST(list_rfc_code, list_previousStatus, list_app_code, list_level, list_stat)
+                                    AS
                                     (
-                                        SELECT rfc_code 
-                                        FROM rfc_line
-                                        WHERE rfc_line.app_code = '$user_id'
+                                        SELECT l.rfc_code, LAG(l.rfcline_stat) OVER(ORDER BY l.rfc_code, l.rfcline_level) previousStatus,
+                                        l.app_code, l.rfcline_level, l.rfcline_stat
+                                        FROM
+                                        rfc_line AS l
+                                        INNER JOIN rfc AS r
+                                        ON r.rfc_code = l.rfc_code
+                                        WHERE ( r.rfc_aprvdate IS NULL  or r.rfc_aprvdate <> '')
+                                        and r.rfc_stat != 'Approved'
+                                        AND l.rfc_code IN
+                                        (
+                                            SELECT rfc_code 
+                                            FROM rfc_line
+                                            WHERE rfc_line.app_code = '$user_id'
+                                        )
                                     )
-                                )
 
-                                SELECT r.rfc_code
-                                FROM LIST
-                                INNER JOIN rfc as r
-                                ON r.rfc_code = list.list_rfc_code
-                                WHERE list.list_app_code = '$user_id'
-                                AND list.list_previousStatus = 'Signed'
-                                AND list.list_stat = '$status';"
+                                    SELECT          list.list_rfc_code
+                                    FROM            LIST AS list
+                                    INNER JOIN      approver AS a
+                                    ON              a.app_code = list.list_app_code
+                                    INNER JOIN      approver AS a1
+                                    ON              a1.app_email = a.app_email
+                                    WHERE           a1.app_code = '$user_id'
+                                    AND             list.list_previousStatus = 'Signed'
+                                    AND             list.list_stat = '$status'  "
                             )
                         );
 
         //Retrieve all unsigned requests basing on the search keyword
         if($search)
         {
-            $requests =  $this->whereIn('rfc_code', array_fetch($requestIDs, 'rfc_code'))
+            $requests =  $this->whereIn('rfc_code', array_fetch($requestIDs, 'list_rfc_code'))
                             ->where(function($query) use ($search){
                                 $query->orWhere('rfc_code', 'LIKE', '%'.$search.'%')
                                     ->orWhere('rfc_name', 'LIKE', '%'.$search.'%')
@@ -227,7 +240,7 @@ class EASRequest extends Model
         //Retrieve all unsigned requests
         else
         {
-            $requests =  $this->whereIn('rfc_code', array_fetch($requestIDs, 'rfc_code'));
+            $requests =  $this->whereIn('rfc_code', array_fetch($requestIDs, 'list_rfc_code'));
         }
 
         return $requests;
@@ -310,36 +323,58 @@ class EASRequest extends Model
         $details = $this->where(['rfc.rfc_code' => $request_id])
                         ->join('request', 'request.req_code', '=', 'rfc.req_code')
                         ->first();
-        $details->bank = $this->where(['rfc.rfc_code' => $request_id])
+
+        $details->bank = $this  ->where(['rfc.rfc_code' => $request_id])
                                 ->join('bank','bank.bank_code','=','rfc.bank_code')
                                 ->whereNotNull('rfc.bank_code')
                                 ->first();
-        $details->approvers = $this->select('approver.app_fname', 'approver.app_lname', 'approver.app_position', 'approver.app_code',
-                                    'rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 'rfc_line.rfcline_remarks','closing.close_desc',
-                                    'closing.close_code')
+
+        $details->approvers = $this ->select('approver.app_fname', 'approver.app_lname', 
+                                            'approver.app_position', 'approver.app_code',
+                                            'rfc_line.rfcline_stat', 'rfc_line.rfcline_level',
+                                            'rfc_line.rfcline_remarks','closing.close_desc',
+                                            'closing.close_code')
                                     ->where(['rfc.rfc_code' => $request_id])
                                     ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
                                     ->join('approver', 'approver.app_code', '=', 'rfc_line.app_code')
                                     ->join('closing', 'closing.close_code', '=', 'rfc_line.close_code')
                                     ->orderBy('rfc_line.rfcline_level')
                                     ->get();
-        $details->user_approver = $this->select('rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 'rfc_line.rfcline_remarks','rfc_line.close_code',
-                                                'rfc_line.rfcline_A', 'rfc_line.rfcline_B', 'rfc_line.rfcline_C', 'rfc_line.rfcline_D', 'rfc_line.rfcline_Others')
-                                    ->where(['rfc_line.rfc_code' => $request_id, 'rfc_line.app_code' => $user_id])
-                                    ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
-                                    ->first();
-        $details->attachments = DB::table('attachment')->where('attachment.rfc_code','=',$request_id)
-                                    ->where(function($query){
-                                        $query->orWhere('attachment.att_delete', '!=', '1')
-                                            ->orWhereNull('attachment.att_delete');
-                                    })
-                                    ->get(['attachment.att_file','attachment.att_name','app_code','att_code']);
+
+        $details->user_approver = $this ->select('rfc_line.rfcline_stat', 'rfc_line.rfcline_level', 
+                                                'rfc_line.rfcline_remarks','rfc_line.close_code',
+                                                'rfc_line.rfcline_A', 'rfc_line.rfcline_B',
+                                                'rfc_line.rfcline_C', 'rfc_line.rfcline_D',
+                                                'rfc_line.rfcline_Others')
+                                        ->where(    
+                                                [
+                                                    'rfc_line.rfc_code' => $request_id,
+                                                    'a1.app_code' => $user_id
+                                                ]
+                                            )
+                                        ->where(function($query){
+                                                $query  ->orWhere('rfc_line.rfcline_stat', '=', 'Pending')
+                                                        ->orWhere('rfc_line.rfcline_stat', '=', 'On-Hold');
+                                        })
+                                        ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
+                                        ->join('approver as a', 'a.app_code', '=', 'rfc_line.app_code')
+                                        ->join('approver as a1', 'a1.app_email', '=', 'a.app_email')
+                                        ->first();
+
+        $details->attachments = DB::table('attachment') ->where('attachment.rfc_code','=',$request_id)
+                                                        ->where(function($query){
+                                                                $query  ->orWhere('attachment.att_delete', '!=', '1')
+                                                                        ->orWhereNull('attachment.att_delete');
+                                                        })
+                                                        ->get([ 'attachment.att_file','attachment.att_name',
+                                                                'app_code','att_code']);
 
         if(str_contains($request_id,'RFC') == '1')
         {
             $details->admin_fees = DB::table('adminfee')->where(['rfc_code' => $request_id])->get();
 
         }
+
         return $details;
     }
 
@@ -349,27 +384,27 @@ class EASRequest extends Model
      *
      * @param $request_id - (required)
      * @param $approver_response (required)
-     * @param $user_id - (required)
+     * @param $approver level - (required) rfcline_level of the approver
      * @param $remarkds - (required) 
      * @return Response
      */
-    public function respondRequest($request_id, $approver_response, $user_id, $remarks='')
+    public function respondRequest($request_id, $approver_response, $approver_level, $remarks='')
     {
         //Update rfc_line table to reflect the user's specific response
-        DB::table('rfc_line')->where(['rfc_code' => $request_id, 'app_code' => $user_id])->update(['rfcline_stat' => $approver_response, 'rfcline_remarks' => $remarks]);
+        DB::table('rfc_line')->where(['rfc_code' => $request_id, 'rfcline_level' => $approver_level])->update(['rfcline_stat' => $approver_response, 'rfcline_remarks' => $remarks]);
         
         //Initialization of needed variables in order to update rfc table
-        $approvers_level = DB::table('rfc_line')->where(['rfc_code' => $request_id, 'app_code' => $user_id])->first(['rfcline_level']);
         $max_level = DB::table('rfc_line')->where(['rfc_code' => $request_id])->max('rfcline_level');
 
-        if($max_level == $approvers_level->rfcline_level)
+        if($approver_response == 'Signed' && $max_level == $approver_level)
         {
-            if($approver_response == 'Signed')
-            {
-                $approver_response = 'Approved';
-            }   
-
-            $this->where(['rfc_code' => $request_id])->update(['rfc_stat' => $approver_response]);    
+            $this->where([  'rfc_code' => $request_id]  )
+                 ->update([ 'rfc_stat' => 'Approved',
+                            'rfc_aprvdate' => date('Y-m-d h:i:s')]);
+        }
+        else if($approver_response != 'Signed')
+        {
+            $this->where(['rfc_code' => $request_id])->update(['rfc_stat' => $approver_response]);   
         }
     }
 
@@ -477,14 +512,22 @@ class EASRequest extends Model
     public function getRequestStatistics($user_id = '', $request_status = '')
     {
         //Retrieve all user assigned requests statistics in bulk
+        //Used in dashboard's statistics
         if(!$request_status && $user_id)
-        {            
-            //Get total number of requests per type
-            $statistics = $this->select(DB::raw('rfc.rfc_stat, count(*) as total'))
-                               ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code')
-                               ->where('rfc_line.app_code', $user_id)
-                               ->groupBy('rfc.rfc_stat')
-                               ->get();
+        {        
+            $statistics =  array_fill_keys(
+                                array('Pending', 'Signed', 'On-Hold', 'Cancelled', 'Denied', 'Reset'), '0');
+
+            $query_result =    DB::select( 
+                                    DB::raw("EXEC usp_get_user_request_statistics '"
+                                                    .$user_id
+                                                    ."';") 
+                                );
+                 
+            foreach($query_result as $data)
+            {
+                $statistics[trim($data->rfcline_stat)] = $data->total;
+            }
         }
         //Retrieve total number of a specific request type
         else
@@ -504,7 +547,7 @@ class EASRequest extends Model
                 $statistics = $statistics[0]['total'];
             }
         }
-                
+
         return $statistics;
     }
 
@@ -517,40 +560,13 @@ class EASRequest extends Model
     public function getUnsignedRequestStatistics($user_id = '')
     {
 
-        $statistics = DB::select(
-                    (
-                        ";WITH LIST(list_rfc_code, list_previousStatus, list_app_code, list_level, list_stat)
-                        AS
-                        (
-                            SELECT l.rfc_code, LAG(l.rfcline_stat) OVER(ORDER BY l.rfc_code, l.rfcline_level) previousStatus,
-                            l.app_code, l.rfcline_level, l.rfcline_stat
-                            FROM
-                            rfc_line AS l
-                            INNER JOIN rfc AS r
-                            ON r.rfc_code = l.rfc_code
-                            WHERE r.rfc_stat = 'pending'
-                            AND l.rfc_code IN
-                            (
-                                SELECT rfc_code 
-                                FROM rfc_line
-                                WHERE rfc_line.app_code = '$user_id'
-                            )
-                        )
+        $statistics_unsigned_requests =  DB::select( 
+                                    DB::raw("EXEC usp_get_statistics_unsigned_requests '"
+                                                    .$user_id
+                                                    ."';") 
+                                );
 
-                        SELECT count(r.rfc_code) as total
-                        FROM LIST
-                        INNER JOIN rfc as r
-                        ON r.rfc_code = list.list_rfc_code
-                        WHERE list.list_app_code = '$user_id'
-                        AND list.list_previousStatus = 'Signed'
-                        AND 
-                        (   list.list_stat = 'Pending' OR
-                            list.list_stat = 'On-Hold'
-                        )"
-                    )
-                );
-                
-        return $statistics[0];
+        return $statistics_unsigned_requests[0]->total;
     }
 
     /**
@@ -561,10 +577,16 @@ class EASRequest extends Model
      *                        (ex: Req-001, Req-002, etc)
      * @return Response
      */
-     public function getRFCRef( $request_code, $project_no)
+     public function getRFCRef( $user_id, $request_code, $project_no)
      {  
-        return $this->where(['req_code' => $request_code, 'project_no' => $project_no])
-                    ->get(['rfc_code', 'rfc_name', 'lot_no']);
+        $rfc_ref =  DB::select( 
+                                    DB::raw("EXEC get_user_granted_rfr_rfc_reference '"
+                                                    .$user_id
+                                                    ."','".$request_code
+                                                    ."','".$project_no
+                                                    ."';") 
+                                );
+        return $rfc_ref;
      } 
 
      /**
@@ -627,7 +649,8 @@ class EASRequest extends Model
         }
         else if( $data['filing_type'] == 'RFC')
         {
-            $request_code  = explode('+', $data['req_ref']);
+            $request_code  = explode('+', $data['input_hidden_req_ref']);
+
             $this->req_code = $request_code['0'];
             $this->rfc_from = $data['from'];
             $this->rfc_to = $data['to'];
@@ -647,7 +670,7 @@ class EASRequest extends Model
         $this->app_code = $user_id;
         $this->rfc_stat= 'Pending';
         $this->sales_date = date('Y-m-d', strtotime($data['date_reserved']));
-
+        
         //Save request
         $this->save();
 
@@ -708,5 +731,24 @@ class EASRequest extends Model
                               ->join('rfc_line', 'rfc_line.rfc_code', '=', 'rfc.rfc_code');
 
         return $filed_request;
+    }
+
+    /**
+     * Checks if user is authorized to approve the request
+     *
+     * @param $user_id - (required) id of user
+     * @param $request_code - (required) rfc_code
+     * @return Response
+     */
+    public function isAuthorizedToApprove($user_id, $request_code)
+    {
+        $autorized_to_sign  =   DB::select( 
+                                    DB::raw("EXEC usp_is_authorized_to_approve '"
+                                                    .$user_id
+                                                    ."','".$request_code
+                                                    ."';") 
+                                );
+
+        return $autorized_to_sign[0]->flag_authorized;
     }
 }

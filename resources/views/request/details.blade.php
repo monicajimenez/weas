@@ -228,8 +228,8 @@
         </div>
       </div>
       <!-- Remarks -->
-      @if( isset($signed) && isset($authorize_to_sign) && $signed == '0' && $authorize_to_sign == 1)
-        @if(trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-hold')
+      @if( isset($authorize_to_sign) && $authorize_to_sign >= 1)
+        @if(trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-Hold')
           @include("request.includes_remarks")
         @endif
       @endif
@@ -244,12 +244,12 @@
           <!-- @if(str_contains(trim($details->rfc_code),'RFC'))
             <li><a class="btn-floating btn-small waves-effect purple modal-trigger" href="#modal_admin_fee"><i class="material-icons">perm_identity</i></a></li>
           @endif -->
-          @if(isset($signed) && isset($authorize_to_sign) && $signed == '0' && $authorize_to_sign == 1)
+          @if(isset($authorize_to_sign) && $authorize_to_sign >= 1)
             @if( trim($details->rfc_stat) == 'Pending' || trim($details->rfc_stat) == 'On-Hold')
               <li><button type="submit" name="approver_response" value="Denied" title="Deny" class="btn-floating btn-small waves-effect waves-light red"><i class="material-icons">thumb_down</i></button></li>
               <li><button type="submit" name="approver_response" value="Signed" title="Approve" class="btn-floating btn-small waves-effect waves-light green"><i class="material-icons">thumb_up</i></button></li>
             @endif
-            @if(trim($details->rfc_stat) == "Pending")
+            @if(isset($details->user_approver->rfcline_stat) && trim($details->user_approver->rfcline_stat) == "Pending")
               <li><button type="submit" name="approver_response" value="On-Hold" title="Put On-Hold" class="btn-floating btn-small waves-effect waves-light yellow"><i class="material-icons">pause_circle_outline</i></button></li>
             @endif
           @endif

@@ -98,7 +98,7 @@ class RequestTypeApproverController extends Controller
         $RequestTypeApprover = new RequestTypeApprover;
         $filing_type = $request->filing_type;
         $project_code = $request->project_code;
-        $request_type_code = '';
+        $request_type_code = $request->request_type_code;
         $user_id = trim(Auth::user()->app_code);
         
         //Get request type code (DB:req_code)
@@ -106,13 +106,9 @@ class RequestTypeApproverController extends Controller
         {
             $request_type_code = $request->req_ref;
         }
-        else if ($filing_type == 'RFR' || $filing_type == 'QAC' || $filing_type == 'PR')
-        {
-            $request_type_code = $request->request_type_code;
-        }
         
         //Retrieve default approvers
-        $request_approvers = $RequestTypeApprover->getRequestApprover($project_code, '', $request_type_code, $user_id);
+        $request_approvers = $RequestTypeApprover->getRequestApprover($project_code, $request_type_code);
  
         return Response::json($request_approvers);
     }

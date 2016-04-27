@@ -127,6 +127,7 @@ class Attachment extends Model
                     ,"php"=>"text/html"
                     ,"htm"=>"text/html"
                     ,"html"=>"text/html"
+                    ,"txt"=>"text/html"
             );
             return $mime_types[strtolower(pathinfo($filename, PATHINFO_EXTENSION))];
     }

@@ -31,9 +31,7 @@ class EmailController extends Controller
     public function send( $request_details, $approver_response)
     {
         $Mail = new EMail;
-        $user_id = trim(Auth::user()->app_code);
-
-        $recipients = $Mail->sendMail($request_details, $approver_response, $user_id);
+        $Mail->sendMail($request_details, $approver_response, trim(Auth::user()->app_code));
 
         return true;
     }

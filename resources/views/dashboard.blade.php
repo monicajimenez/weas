@@ -3,10 +3,10 @@
 @section('pagetitle', 'Dashboard')
 @section("content")
 <div class="row">
-	<div class="col s12 m12">
+	<div class="col s12 m12 l12">
 		<!-- Requests Statistics -->
 		<div class="row">
-			<div class="col s12 m10 right">
+			<div class="col s12 m10 l10 right">
 				<div id="card-stats">
 				    <div class="row">
 						<!-- View Errors -->
@@ -16,47 +16,67 @@
 					        @endforeach
 					    @endif
 				    	<!-- End: View Errors -->
-					    @foreach ($statistics as $data)
-				        	<div class="col s12 m6 l3">
-					        	<div class="card">
-					                <div class="card-content
-					                	<?php
-				                	 		if( trim($data->rfc_stat) == 'Pending') echo 'blue';
-						                    elseif( trim($data->rfc_stat) == 'Denied') echo 'red';
-						                    elseif( trim($data->rfc_stat) == 'On-Hold') echo 'yellow';
-						                    elseif( trim($data->rfc_stat) == 'Approved') echo 'green';
-						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'grey';
-						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'purple';
-					                    ?>
-					                white-text">
-					                    <p class="card-stats-title"><i class="material-icons left">
-					                    @if( trim($data->rfc_stat) == 'Pending')thumbs_up_down
-					                    @elseif( trim($data->rfc_stat) == 'Denied')thumb_down
-					                    @elseif( trim($data->rfc_stat) == 'On-Hold')pause_circle_outline
-					                    @elseif( trim($data->rfc_stat) == 'Approved')thumb_up
-					                    @elseif( trim($data->rfc_stat) == 'Cancelled')not_interested
-					                    @elseif( trim($data->rfc_stat) == 'Reset')restore
-					                    @endif
-					                    </i>{{trim($data->rfc_stat)}} Requests</p>
-					                    <h4 class="card-stats-number center-align">{{trim($data->total)}}</h4>
-					                    <!-- <p class="card-stats-compare"><i class="mdi-hardware-keyboard-arrow-up"></i> 15% <span class="green-text text-lighten-5">from yesterday</span> 
-					                    </p>-->
-					                </div>
-					                <div class="card-action
-					                	<?php
-				                	 		if( trim($data->rfc_stat) == 'Pending') echo 'blue';
-						                    elseif( trim($data->rfc_stat) == 'Denied') echo 'red';
-						                    elseif( trim($data->rfc_stat) == 'On-Hold') echo 'yellow';
-						                    elseif( trim($data->rfc_stat) == 'Approved') echo 'green';
-						                    elseif( trim($data->rfc_stat) == 'Cancelled') echo 'grey';
-						                    elseif( trim($data->rfc_stat) == 'Reset') echo 'purple';
-					                    ?>
-					                darken-2">
-					                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
-					                </div>
-					            </div>
-				        	</div>
-				        @endforeach
+				    	<!--- Statistics-->
+				    	<div class="col s12 m6 l3">
+				        	<div class="card">
+				                <div class="card-content blue white-text">
+				                    <p class="card-stats-title">
+				                    	<i class="material-icons left">thumbs_up_down</i>
+				                    	Pending Requests
+				                    </p>
+				                    <h4 class="card-stats-number center-align">{{trim($statistics['Pending'])}}</h4>
+				                </div>
+				                <div class="card-action blue darken-2">
+				                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
+				                </div>
+				            </div>
+			        	</div>
+
+			        	<div class="col s12 m6 l3">
+				        	<div class="card">
+				                <div class="card-content yellow darken-1 white-text">
+				                    <p class="card-stats-title">
+				                    	<i class="material-icons left">pause_circle_outline</i>
+				                    	On-Hold Requests
+				                    </p>
+				                    <h4 class="card-stats-number center-align">{{trim($statistics['On-Hold'])}}</h4>
+				                </div>
+				                <div class="card-action yellow darken-2">
+				                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
+				                </div>
+				            </div>
+			        	</div>
+
+				    	<div class="col s12 m6 l3">
+				        	<div class="card">
+				                <div class="card-content green white-text">
+				                    <p class="card-stats-title">
+				                    	<i class="material-icons left">thumbs_up_down</i>
+				                    	Signed Requests
+				                    </p>
+				                    <h4 class="card-stats-number center-align">{{trim($statistics['Signed'])}}</h4>
+				                </div>
+				                <div class="card-action green darken-2">
+				                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
+				                </div>
+				            </div>
+			        	</div>
+
+				    	<div class="col s12 m6 l3">
+				        	<div class="card">
+				                <div class="card-content red white-text">
+				                    <p class="card-stats-title">
+				                    	<i class="material-icons left">thumb_down</i>
+				                    	Denied Requests
+				                    </p>
+				                    <h4 class="card-stats-number center-align">{{trim($statistics['Denied'])}}</h4>
+				                </div>
+				                <div class="card-action red darken-2">
+				                    <div id="clients-bar"><canvas width="290" height="25" style="display: inline-block; width: 290px; height: 25px; vertical-align: top;"></canvas></div>
+				                </div>
+				            </div>
+			        	</div>
+				        	<!--- End: Statistics-->
 				    </div>
 				</div>
 			</div>
@@ -68,8 +88,8 @@
 		<div class="row">
 			<div class="col s11 m10 right">
 				<h5 class="left-align">Unsigned Requests
-					@if($statistics_unsigned->total > 0)
-						<em class="red-text">({{$statistics_unsigned->total}})</em>
+					@if($statistics_unsigned > 0)
+						<em class="red-text">({{$statistics_unsigned}})</em>
 					@endif
 				</h5>
 			</div>
@@ -77,7 +97,7 @@
 		<!-- End: Request Table Label -->
 
     	<!-- Search Field -->
-	    @if($statistics_unsigned->total > 0)
+	    @if($statistics_unsigned > 0)
 	    <div class="row">
 	      <div class="col s12 m3 right">	
 	        <form action="<?php route('dashboard') ?>" method="get">

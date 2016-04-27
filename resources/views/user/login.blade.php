@@ -21,7 +21,7 @@
 					    	<div class="row section">
 			                  <div class="input-field col s10">
 			                    <input name="username" type="text" class="validate">
-			                    <label for="username">Username</label>
+			                    <label for="username">Email</label>
 			                  </div>
 			                </div>
 					    	<div class="row section">

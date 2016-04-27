@@ -26,40 +26,12 @@ class Project extends Model
      */
     public function getProjects($user_id = '', $request_type = '', $return_value = '3')
     {	
-    	//Initialization
-    	$query_columns = ['project.project_no','project.project_desc'];
-    	$RequestType = new RequestType;
-
-    	//Set the needed columns 
-    	if($return_value == '1')
-    	{
-    		$query_columns = ['project.project_no'];
-    	}
-    	else if($return_value == '2')
-    	{
-    		$query_columns = ['project.project_desc'];
-    	}
-
-        var_dump($request_type);
-
-    	//Retrieve projects
-        $query = $this->join('request_line', 'request_line.project_no', '=', 'project.project_no')
-                      ->join('request', 'request.req_code', '=', 'request_line.req_code')
-    				  ->where(['request.req_group' => $request_type]);
-
-        //If only projects where the user
-        //have rights as filer, append query
-        if($user_id)
-        {
-            $query->where(['request_line.app_code' => $user_id, 'request_line.app_level' => '1'] );
-        }
-
-        //Get query's result
-        $projects = $query->orderBy('project.project_no')
-                        ->distinct('project.project_no')
-                        ->get($query_columns);
-        
-        dd($projects);
+    	$projects =  DB::select( 
+                                    DB::raw("EXEC usp_get_projects '"
+                                                    .$user_id
+                                                    ."','".$request_type
+                                                    ."';") 
+                                );
     	return $projects;
     }
 }
