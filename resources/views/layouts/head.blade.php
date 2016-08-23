@@ -16,4 +16,4 @@
 <!-- Add required CSS files for Materialize to function -->
 <link type="text/css" rel="stylesheet" href="{{ asset('css/materialize.min.css') }}" media="screen,projection"/>
 <link type="text/css" rel="stylesheet" href="{{ asset('css/custom.css') }}">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="{{ asset('font/material-design-icons/materializefonticons.css')}}">

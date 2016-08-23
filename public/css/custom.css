@@ -131,6 +131,10 @@ input[type=text]:disabled+label{
   padding-left: 0px;
 }
 
+.modal{
+  min-height: 50%;
+}
+
 .modal-content .card{
   margin-left:5px;
   width: 166px;
@@ -156,7 +160,7 @@ input[type=text]:disabled+label{
 
 .preloader-wrapper{
   position:absolute;
-  display:none;
+  visibility: hidden;
 }
 
  textarea.materialize-textarea:disabled+label, 

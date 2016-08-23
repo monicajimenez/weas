@@ -23,12 +23,20 @@
 
         @if($filing_type =='RFR')
           <div class="row">
+            <input type="hidden" name="name_flag_nature_reopening" value="{{Request::old('name_flag_nature_reopening')}}">
             <div class="input-field col l3">
-                <input class="with-gap" id="forfeiture" name="nature_reopening[]" value="Code-001" type="radio" checked/>
+                <input class="with-gap" id="forfeiture" name="nature_reopening[]" value="Code-001" type="radio" 
+                      @if(  Request::old('name_flag_nature_reopening') || 
+                            !Request::old('name_flag_nature_reopening') == 'Code-001' )
+                              checked 
+                      @endif />
                 <label for="forfeiture">Forfeiture</label>
             </div>
             <div class="input-field col l3">
-              <input class="with-gap" id="request_for_change" name="nature_reopening[]" value="Code-002" type="radio"/>
+              <input class="with-gap" id="request_for_change" name="nature_reopening[]" value="Code-002" type="radio"
+                      @if(  Request::old('name_flag_nature_reopening') == 'Code-002' )
+                              checked 
+                      @endif />
               <label for="request_for_change">Request for Change</label>
             </div>
           </div>
@@ -48,16 +56,19 @@
 
         <div class="row">
           <div class="input-field col l6" id="project_type_container_forfeiture">
-            <select id="project_type" name="project_type">
-              <option value="" disabled selected>Choose your option</option>
+            <select id="project_type" name="project_type" value="{{Request::old('project_type')}}">
+              <option @if(!Request::old('project_type')) selected @endif>Choose your option</option>
               @foreach($projects as $project)
-                <option value="{{$project->project_no}}">{{$project->project_no}} - {{$project->project_desc}}</option>
+                <option value="{{$project->project_no}}" 
+                    @if(Request::old('project_type') == $project->project_no) selected @endif >
+                        {{$project->project_no}} - {{$project->project_desc}}
+                </option>
               @endforeach
             </select>
             <label for="project_type">Project Name</label>
           </div>
           <div class="input-field col l3" id="project_type_container_rfr_rfc">
-            <input id="project_type" name="project_type" type="text" class="validate" @if($filing_type=='RFC') disabled @endif>
+            <input id="project_type" name="project_type" type="text" class="validate" value="{{Request::old('project_type')}}" @if($filing_type=='RFC') disabled @endif>
             <label for="project_type">Project Name</label>
           </div>
           @if($filing_type == 'RFR')
@@ -220,12 +231,79 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
-    $('#rfc_ref_no_container').hide();
-    $('#container_modal_add_approver').hide();
-    $('#project_type_container_rfr_rfc').hide();
-    $('#project_type_container_rfr_rfc #project_type').prop('disabled','true');
-    
-    //Function getting new token
+    //Initialize global variables
+    var_filing_type = $('input[name="filing_type"]').val();
+
+    //Initializes the newly opened form or for repopulating fields
+    onLoad();
+
+    function onLoad()
+    {    
+        //Initialization
+        var_project_type = $('#project_type').val();
+        var_rfc_req_ref = $('input[name="input_hidden_req_ref"]').val();
+        var_name_flag_nature_reopening = $('input[name="name_flag_nature_reopening"]').val();
+        var_rfc_ref_no =  $('[name=rfc_ref_no]').text();
+
+        //Hide fields that are not included, depending on the filing type
+        $('#rfc_ref_no_container').hide();
+        $('#container_modal_add_approver').hide();
+        $('#project_type_container_rfr_rfc').hide();
+        $('#project_type_container_rfr_rfc #project_type').prop('disabled','true');
+
+        //For repopulating approvers table and the fields that triggers it.
+        if( ( var_project_type && var_project_type != 'Choose your option' &&
+              ( 
+                  (var_filing_type == 'RFC' && var_rfc_req_ref && var_rfc_req_ref != 'Choose your option') || 
+                  (var_filing_type == 'QAC') ||
+                  (var_filing_type == 'RFR')
+              )
+            ) ||
+            var_name_flag_nature_reopening == 'Code-002' 
+          )
+        {
+          //QAC: Call the project type dropdown handler to query values to populate Approvers Table
+          //RFC: Call the project type dropdown handler to query values for Request Type Dropdown
+          projectTypeChangeHandler();
+
+
+          //Additional Step for RFR->Request for Change
+          if( var_filing_type == 'RFR' && var_name_flag_nature_reopening == 'Code-002')
+          {   
+            requiredRFRRFCFields();
+            rfrRFCAdditionalSetUp();
+
+            //If rfc ref number needs to be repopulated
+            if(var_rfc_ref_no)
+            {
+                var_lot_code = $('[name=lot_code]').text();
+                var_project_type = $('[name=project_type]').text();
+                var_rfc_ref_num_split = var_rfc_ref_no.split(':');
+                var_request_type_code = var_rfc_ref_num_split[0];
+                var_request_description = var_rfc_ref_num_split[1]; 
+
+                rfrRfcReqRefTableValuesHandler( var_project_type, var_request_type_code, 
+                                                var_request_description, var_lot_code);
+            }
+          }
+
+          //Additional Step for RFCs
+          if(var_filing_type == 'RFC')
+          {      
+            //Display the chosen request type.
+            var_rfc_req_ref_split = var_rfc_req_ref.split('+');
+
+            $('#container_req_ref input').val(var_rfc_req_ref_split[1]);
+            $('#container_req_ref #req_ref').find('#'+ $.trim(var_rfc_req_ref_split[0])).prop("selected","selected");
+            $('input[name="input_hidden_req_ref"]').val(var_rfc_req_ref);
+            
+            //Call the rfc request type handler to query the approvers
+            rfcReqRefHandler(var_rfc_req_ref);
+          }
+        }
+    }
+
+    //Function getting new token.
     function getToken()
     {
       $.ajax({
@@ -260,7 +338,7 @@
                         "<td class='center-align'>" + approver["app_position"] + "</td>" +
                         "<td class='center-align'>" + approver["mandatory"] + "</td>";
 
-        if(approver["mandatory"] != 'Y')
+        if(approver["mandatory"] != 'Y' && approver["app_level"] != 1)
         {
           newRowContent += "<td class='center-align'>" + "<a name='"+ approver["app_code"]+"' class='delete_app btn-flat'><i class='tiny material-icons'>delete</i></a>" + "</td>";
         }
@@ -300,18 +378,22 @@
     //RFC, QAC and RFR (Forfeiture)  Filing: Handler for Project Name Dropdown and populating the Approvers' table thereafter
     //RFC Filing: Handler for Project Name Dropdown and populating the RFC REF dropdown thereafter
     $('#project_type').change(function(){
+      projectTypeChangeHandler();
+    });
+
+    function projectTypeChangeHandler()
+    {
       getToken();
-      filing_type = $('input[name="filing_type"]').val();
       
-      if( filing_type == 'RFR' || filing_type == 'QAC')
+      if( var_filing_type == 'RFR' || var_filing_type == 'QAC')
       {
         request_type_code = '';
 
-        if(filing_type == 'RFR')
+        if(var_filing_type == 'RFR')
         {
           request_type_code = 'Req-027'; //request_type_code for Forfeitures
         }
-        if(filing_type == 'QAC')
+        if(var_filing_type == 'QAC')
         {
           request_type_code = 'Req-021'; //request_type_code for QAC
         }
@@ -319,29 +401,30 @@
         $.ajax({
           url: '{{route("getrequesttypeapprovers")}}',
           method: 'POST',
-          data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(), 
+          data: {'project_code' :$('#project_type').val(), 'filing_type': var_filing_type,
                  'request_type_code': request_type_code, '_token': $('meta[name="csrf-token"]').attr('content') },
           success: function(data){
               populateApproversTable(data);
           }
         });
       }
-      else if( filing_type == 'RFC')
+      else if( var_filing_type == 'RFC')
       {
           $.ajax({
             url: '{{route("getrequesttype")}}',
             method: 'POST',
-            data: {'request_type': $('input[name="filing_type"]').val(), 'project_type' :$('#project_type').val(), 
+            data: {'request_type': var_filing_type, 'project_type' :$('#project_type').val(), 
                   '_token': $('meta[name="csrf-token"]').attr('content') },
             success: function(data){
               pointerReqRef = $('#req_ref');
               liPointer = $('#req_ref').prev();
+              req_ref_val = $('#req_ref').val();
 
               pointerReqRef.empty();
               liPointer.empty();
 
-              liPointer.append('<li class="disabled active"><span>Choose your option</span></li>');
-              pointerReqRef.append('<option value="disabled selected">Choose your option</option>');
+              liPointer.append('<li class="disabled"><span>Choose your option</span></li>');
+              pointerReqRef.append('<option value="disabled">Choose your option</option>');
             
               $.each( data, function( key, rfc_ref ) {
                 liPointer.append($("<li></li>").html($("<span></span>").attr("value",rfc_ref['req_desc'])
@@ -354,26 +437,35 @@
             }
           });           
       }
-    });
+    }
 
-    //RFC Filing: Handler of the Request Type Drop Down under Additional Details
+    //RFC Filing: Handler of the Request Type Drop Down onlick under Additional Details
     //Requires that a Project Name be chosen in the Basic Details Area
     $('#container_req_ref ul').on('click', 'li', function(){
       $('#container_req_ref input').val($(this).text());
       pointerSpan = $(this).find("span");
       $('#container_req_ref #req_ref').find('#'+ pointerSpan.attr('class')).prop("selected","selected");
+      $('input[name="input_hidden_req_ref"]').val($('#req_ref').val());
+      rfcReqRefHandler($('#req_ref').val());
+    });
+
+    //RFC Filing: Handler of the Request Type Drop Down under Additional Details
+    //Requires that a Project Name be chosen in the Basic Details Area
+    function rfcReqRefHandler(var_rfc_req_ref)
+    {
       getToken();
-      var data = $('#req_ref').val().split('+');
+      data = var_rfc_req_ref.split('+');
+
       $.ajax({
         url: '{{route("getrequesttypeapprovers")}}',
         method: 'POST',
-        data: {'project_code' :$('#project_type').val(), 'filing_type': $('input[name="filing_type"]').val(),
+        data: {'project_code' :$('#project_type').val(), 'filing_type': var_filing_type,
                'req_ref': data[0], '_token': $('meta[name="csrf-token"]').attr('content') },
         success: function(data){
             populateApproversTable(data);
         }
-      });   
-    });
+      });
+    }
 
     //RFR (Request for Change) Filing: Handler for RFC Request Reference Dropdown and Populating of RFCs Table thereafter
     $('#rfc_request_reference').change(function(){
@@ -385,7 +477,9 @@
         $.ajax({
           url: '{{route("getRFCRequestReferences")}}',
           method: 'POST',
-          data: {'request_code' : request_code, 'project_no': project_no, '_token': $('meta[name="csrf-token"]').attr('content') },
+          data: {'request_code' : request_code, 'project_no': project_no, '_token': $('meta[name="csrf-token"]').attr('content') },beforeSend: function() {
+              $('.preloader-wrapper').css('visibility', 'visible');
+           },
           success: function(data){
               $('#table_rfc_request_reference tbody').empty();
 
@@ -401,6 +495,8 @@
                                 "</tr>";
                 $("#table_rfc_request_reference tbody").append(newRowContent);
               });
+              
+              $('.preloader-wrapper').css('visibility', 'hidden');
           }
         })
     });
@@ -409,33 +505,38 @@
     $('#table_rfc_request_reference').on('click', '.add_rfc_request_referece', function() {
       getToken();
       data = $(this).attr('id').split('.');
-      request_type_code = data[0];
       project_code = data[2];
       request_type_code = data[1];
       request_description = data[3];
       lot_code = data[4];
-      filing_type = 'RFR';
 
+      rfrRfcReqRefTableValuesHandler(project_code, request_type_code, request_description, lot_code)
+    });
+
+    function rfrRfcReqRefTableValuesHandler(project_code, request_type_code, request_description, lot_code)
+    {
       $.ajax({
         url: '{{route("getrequesttypeapprovers")}}',
         method: 'POST',
-        data: {'project_code' : project_code, 'filing_type': filing_type, 'request_type_code': request_type_code ,'_token': $('meta[name="csrf-token"]').attr('content') },
+        data: {'project_code' : project_code, 'filing_type': var_filing_type, 'request_type_code': request_type_code ,'_token': $('meta[name="csrf-token"]').attr('content') },
         success: function(data){
              populateApproversTable(data);
         }
       });
       
       $('[name=project_type]').val(project_code);
+      $('[name=project_type]').text(project_code);
       $('[name=rfc_ref_no]').val(request_type_code + ' : ' + request_description);
-      $('[name=rfc_ref_no]').val(request_type_code + ' : ' + request_description);
+      $('[name=rfc_ref_no]').text(request_type_code + ' : ' + request_description);
       $('[name=lot_code]').val(lot_code);
+      $('[name=lot_code]').text(lot_code);
       $('#project_type_container_rfr_rfc input[name=project_type]').prop('disabled', false);
       $('input[name=lot_code]').prop('disabled', false);
       $('#rfc_ref_no_container label').addClass('active');
       $('label[for=lot_code]').addClass('active');
       $('#project_type_container_rfr_rfc label[for=project_type]').addClass('active');
       $('#btn_modal_rfc_request_reference').hide();
-    });
+    }
 
     //APPROVER TABLE SORTING FUNCTIONALITIES
     var fixHelperModified = function(e, tr) {
@@ -504,6 +605,15 @@
       $('[name=number_of_amortization_paid]').addClass('required');
     }
 
+    function rfrRFCAdditionalSetUp()
+    {
+      $('#project_type_container_rfr_rfc input[name=project_type]').prop('disabled', true);
+      $('input[name=lot_code]').prop('disabled', true);
+      $('input[name=name_flag_nature_reopening]').val('Code-002');
+      toogleEvents();
+      document.getElementById('request_for_change').checked = true;
+    }
+
     //TOGGLE FUNCTIONALITIES
     function toogleEvents()
     {
@@ -518,15 +628,12 @@
     //RFR Onclick Events
     $('#request_for_change').click(function(){  
       requiredRFRRFCFields();
-
-      $('#project_type_container_rfr_rfc input[name=project_type]').prop('disabled', true);
-      $('input[name=lot_code]').prop('disabled', true);
-      toogleEvents();
-      document.getElementById('request_for_change').checked = true;
+      rfrRFCAdditionalSetUp();
     }); 
 
     $('#forfeiture').click(function(){  
       requiredForfeitureFields();
+      $('input[name=name_flag_nature_reopening]').val('Code-001');
       toogleEvents();
     }); 
 

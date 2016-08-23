@@ -107,6 +107,7 @@ class RequestTypeController extends Controller
     public function getRequestTypeTest($request_type = '', $project_type='')
     {
         $RequesType = new RequestType;
-        return Response::json($RequesType->getRequestType($request_type, $project_type));
+        $user_id = trim(Auth::user()->app_code);
+        return Response::json($RequesType->getRequestType($request_type, $project_type, $user_id));
     }
 }

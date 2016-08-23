@@ -45,7 +45,7 @@ class EASRequestApprover extends Model
                     'rfcline_level' => 1,
                     'rfc_code' => $request_code,
                     'req_code' => $request_type_code,
-                    'rfcline_stat' => 'Pending',
+                    'rfcline_stat' => 'Signed',
                     'rfcline_remarks' => $filer_remarks
                 ];
 

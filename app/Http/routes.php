@@ -150,7 +150,34 @@ Route::resource('unit', 'UnitController');
 /*End:Unit*/
 
 /*TEST Routes*/
-Route::get('userdetails', function(){
+
+Route::get('test/userdetails', function(){
    dd(Auth::user());
+});
+
+Route::get('test/request/approve/pr', function(){
+  return view('request.purchase.details');
+});
+
+Route::get('test/getrfrrfcref/{request_code}/{project_no}',[
+    'uses' => 'RequestController@testgetRFCRequestRefence'
+]);
+
+Route::get('test/rfcgetrequesttype/{request_code}/{project_no}',[
+    'uses' => 'RequestTypeController@getRequestTypeTest'
+]);
+
+Route::get('test/email/', function(){
+  $subject = '[RFC_CODE_HERE]: Request Edited by Filer';
+  $recipientsEmail = 'maria.monica.jimenez@aboitiz.com';
+  $recipientsName = 'Monica';
+
+  //Send Email
+  Mail::send('email.test_request_alert', [], function($message) use($subject, $recipientsEmail, $recipientsName)
+  {
+      $headers = $message->getHeaders();
+      $message->to($recipientsEmail, $recipientsName)
+          ->subject($subject);
+  });
 });
 /*End:Request Type Approver*/
